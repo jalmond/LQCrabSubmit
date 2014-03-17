@@ -6,10 +6,10 @@ MuD  /SingleMu/Run2012D-22Jan2013-v1/AOD
 
 
 ### single electron
-ElA  /SingleEl/Run2012A-22Jan2013-v1/AOD
-ElB  /SingleEl/Run2012B-22Jan2013-v1/AOD
-ElC  /SingleEl/Run2012C-22Jan2013-v1/AOD
-ELD  /SingleEl/Run2012D-22Jan2013-v1/AOD
+ElA  NEED/TO/ADD/
+ElB  NEED/TO/ADD/
+ElC  NEED/TO/ADD/
+ELD  NEED/TO/ADD/
 
 ### Double Muon
 DiMuA	/DoubleMu/Run2012A-22Jan2013-v1/AOD
