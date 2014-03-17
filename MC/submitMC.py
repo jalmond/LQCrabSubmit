@@ -2,13 +2,13 @@ import os,sys
 from functions import *
 
 resubmit_stuck =False
-
 type="MC"
 
 ##### First entry is directory name
-signallist_mumu = ["Signal_MuMu", "HNMuMu50", "HNMuMu70", "HNMuMu90", "HNMuMu100", "HNMuMu125", "HNMuMu150", "HNMuMu175", "HNMuMu200","HNMuMu225","HNMuMu250","HNMuMu275","HNMuMu300","HNMuMu325","HNMuMu350","HNMuMu375","HNMuMu400","HNMuMu500","HNMuMu600", "HNMuMu700"]
+
 signallist_ee = ["Signal_EE", "HNEE50", "HNEE70", "HNEE90", "HNEE100", "HNEE125", "HNEE150", "HNEE175", "HNEE200","HNEE225","HNEE250","HNEE275","HNEE300","HNEE325","HNEE350","HNEE375","HNEE400","HNEE500","HNEE600", "HNEE700"]
 
+#### premade lists
 DY = ["DY", "DY10to50", "DY50plus"]
 QCD = ["QCD", "QCD_mumu", "QCD_30to40EE", "QCD_40EE"]
 QCD2 = ["QCD", "QCD_mu15", "QCD_15to20mu", "QCD_20to30mu", "QCD_30to50mu", "QCD_50to80mu", "QCD_80to120mu", "QCD_120to170mu", "QCD_170to300mu", "QCD_300to470mu", "QCD_470to600mu", "QCD_600to800mu", "QCD_800to1000mu", "QCD_1000mu", "QCD_20to30E", "QCD_30to80E", "QCD_80to170E", "QCD_170to250E", "QCD_250to350E", "QCD_350E"]
@@ -18,7 +18,7 @@ W = ["Wjet", "WJets"]
 
 
 ######### CHOOSE LIST FROM ABOVE
-list = signallist_ee
+list_to_submit = signallist_ee
 
 #######################################################################
 ### Use extension ONLY if you are submitting a sample for a second time
@@ -32,7 +32,7 @@ dir=""
 nsamples=0
 not_complete = []
 n_running = 0
-for i in list:
+for i in list_to_submit:
     nsamples+=1
     if nsamples ==1:
         dir= i

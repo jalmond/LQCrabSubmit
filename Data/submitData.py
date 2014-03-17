@@ -9,7 +9,7 @@ Muons = ["SingleMuon" ,"MuA", "MuB", "MuC", "MuD"]
 DoubleMuon = ["DoubleMuon" ,"DiMuB","DiMuC","DiMuD"]
 DoubleElectron = ["DoubleElectron" ,"DiElA"]
 
-list = DoubleMuon
+list_to_submit = DoubleMuon
 
 ##### Set true if jobs are not submitting after several days
 resubmit_stuck =False
@@ -25,7 +25,7 @@ dir=""
 nsamples=0
 not_complete = []
 n_running = 0
-for i in list:
+for i in list_to_submit:
     nsamples+=1
     if nsamples ==1:
         dir= i
