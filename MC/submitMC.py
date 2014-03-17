@@ -4,29 +4,25 @@ from functions import *
 resubmit_stuck =False
 
 type="MC"
+
 ##### First entry is directory name
 signallist_mumu = ["Signal_MuMu", "HNMuMu50", "HNMuMu70", "HNMuMu90", "HNMuMu100", "HNMuMu125", "HNMuMu150", "HNMuMu175", "HNMuMu200","HNMuMu225","HNMuMu250","HNMuMu275","HNMuMu300","HNMuMu325","HNMuMu350","HNMuMu375","HNMuMu400","HNMuMu500","HNMuMu600", "HNMuMu700"]
-
 signallist_ee = ["Signal_EE", "HNEE50", "HNEE70", "HNEE90", "HNEE100", "HNEE125", "HNEE150", "HNEE175", "HNEE200","HNEE225","HNEE250","HNEE275","HNEE300","HNEE325","HNEE350","HNEE375","HNEE400","HNEE500","HNEE600", "HNEE700"]
 
 DY = ["DY", "DY10to50", "DY50plus"]
-
 QCD = ["QCD", "QCD_mumu", "QCD_30to40EE", "QCD_40EE"]
-
 QCD2 = ["QCD", "QCD_mu15", "QCD_15to20mu", "QCD_20to30mu", "QCD_30to50mu", "QCD_50to80mu", "QCD_80to120mu", "QCD_120to170mu", "QCD_170to300mu", "QCD_300to470mu", "QCD_470to600mu", "QCD_600to800mu", "QCD_800to1000mu", "QCD_1000mu", "QCD_20to30E", "QCD_30to80E", "QCD_80to170E", "QCD_170to250E", "QCD_250to350E", "QCD_350E"]
-
 dibosonlist = ["Diboson", "WW","WZ","ZZ"]
-
 ttbar = ["Top", "ttbar"]
-
 W = ["Wjet", "WJets"]
 
+
+######### CHOOSE LIST FROM ABOVE
 list = signallist_ee
 
-##############################################################
-#### Add choice of site
-###
-###############################################################
+#######################################################################
+### Use extension ONLY if you are submitting a sample for a second time
+#######################################################################
 
 Extension= "False"
 ext="V1"
@@ -129,10 +125,10 @@ for i in list:
                     nstrips+=1
                     if nstrips == 1:
                         njob= int(s)
-                nstrips=0        
+                nsstrips=0        
                 for s in strippedline.split():
-                    nstrips+=1
-                    if nstrips < 3:
+                    nsstrips+=1
+                    if nsstrips < 3:
                         if not int(s) == 0:
                             resubmit_list.append(njob)
                             break

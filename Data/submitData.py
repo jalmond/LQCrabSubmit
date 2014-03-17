@@ -10,19 +10,13 @@ DoubleMuon = ["DoubleMuon" ,"DiMuB","DiMuC","DiMuD"]
 DoubleElectron = ["DoubleElectron" ,"DiElA"]
 
 list = DoubleMuon
-#list = DoubleElectron
-#list = EMuons
 
+##### Set true if jobs are not submitting after several days
 resubmit_stuck =False
-
-##############################################################
-#### Add choice of site
-###
-###############################################################
 
 #### IF YOU WISH TO PRODUCE A SECOND SAMPLE
 ### put any sample name in Extension and it will be resubmitted with new output name  
-Extension= []
+Extension= "False"
 ext="V1"
 
 
@@ -50,9 +44,9 @@ for i in list:
                     dataset=entries[1]
 
     
-    for j in Extension:
-        if i == j : i = i+ ext
-        
+    if Extension == "True":
+        i = i+ ext
+
 
     cfgfile=  dir+"/ntupleCrab_DATA_" + i + ".cfg"
     jobfile = dir + "/" + i + "/"
