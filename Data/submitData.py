@@ -43,10 +43,11 @@ for i in list_to_submit:
                 if i == entries[0]:
                     dataset=entries[1]
 
-    
+    print "dataset=" + dataset
+
     if Extension == "True":
         i = i+ ext
-
+        print "Adding extension to job name: " + ext
 
     cfgfile=  dir+"/ntupleCrab_DATA_" + i + ".cfg"
     jobfile = dir + "/" + i + "/"
@@ -57,12 +58,14 @@ for i in list_to_submit:
 
     #### DOES THE DIR EXIST?
     if not (os.path.exists(cfgfile)):
+        print "crab dir does not exist for this job. Making now"
         configfile=open(cfgfile,'w')
         configfile.write(makeConfigFile(dataset, i, dir))
         configfile.close()
         os.system("crab -create -cfg " + cfgfile )
     ##### DOES THE JOB EXIST?
     elif not (os.path.exists(crablog)):    
+        print "Crab dir exists but no job directory. Creating the jobs with crab -create"
         os.system("crab -create -cfg " + cfgfile )
     #### HAS THE JOB BEEN SUBMITTED    
     else:
@@ -90,7 +93,7 @@ for i in list_to_submit:
     for line in logfile:
         if search_sub in line:
             all_submitted=True
-                
+            print "All sub jobs are previously submitted to crab"
     logfile.close()
 
     if all_submitted == False:
