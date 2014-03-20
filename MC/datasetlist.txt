@@ -46,7 +46,7 @@ DY50plus /DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10
 
 # top
 ttbar /TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7C-v1/AODSIM
-Wgamma /WGToLNuG_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X- PU_S10_START53_V7A-v1/AODSIM
+Wgamma /WGToLNuG_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X PU_S10_START53_V7A-v1/AODSIM
 
 # Diboson
 WZ /WZ_TuneZ2star_8TeV_pythia6_tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
