@@ -11,9 +11,6 @@ DoubleElectron = ["DoubleElectron" ,"DiElA"]
 
 list_to_submit = DoubleMuon
 
-##### Set true if jobs are not submitting after several days
-resubmit_stuck =False
-
 #### IF YOU WISH TO PRODUCE A SECOND SAMPLE
 ### put any sample name in Extension and it will be resubmitted with new output name  
 Extension= "False"
@@ -154,21 +151,6 @@ for i in list_to_submit:
                         break
         logfile.close()
 
-        status_search = "N   Cancelled"
-        logfile = open("log.txt",'r')
-        njob=0
-        for line in logfile:
-            if status_search in line:
-                nstrips=0
-                for s in line.split():
-                    nstrips+=1
-                    if nstrips == 1:
-                        njob= int(s)
-                        resubmit_list.append(njob)
-                        break
-        logfile.close()
-                                                                                                                                                            
-                                                                                                                                                         
 
         ##### RESUBMIT JOBS (FAILED+ ABORTED)
         
@@ -204,8 +186,8 @@ for i in list_to_submit:
         logfile.close()
 
 
-        ######### ARE JOBS STILL SUBMITTED AND NOT RUNNING?
-        status_search = "N   Submitted         SubSuccess"
+        ######### ARE JOBS Cancelled
+        status_search = "N   Cancelled"
         logfile = open("log.txt",'r')
         stuck_list = []
         njob=0
@@ -239,15 +221,14 @@ for i in list_to_submit:
         if not nresubmit == 0:
             stuck_fulllist.append(relist)
 
-        if resubmit_stuck:    
-            for k in stuck_fulllist:
-                kill_command = "crab -kill " + k + " -c " + dir+ "/" +  i
-                resubmit_command = "crab -resubmit " + k + " -c " + dir+ "/" +  i
-                print kill_command
-                print resubmit_command
-                not_complete.append(i)
-                os.system(kill_command)
-                os.system(resubmit_command)
+        for k in stuck_fulllist:
+            kill_command = "crab -kill " + k + " -c " + dir+ "/" +  i
+            resubmit_command = "crab -resubmit " + k + " -c " + dir+ "/" +  i
+            print kill_command
+            print resubmit_command
+            not_complete.append(i)
+            os.system(kill_command)
+            os.system(resubmit_command)
             
         os.system("rm log.txt")   
 
