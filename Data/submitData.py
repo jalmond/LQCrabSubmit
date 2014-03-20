@@ -11,7 +11,7 @@ DoubleElectron = ["DoubleElectron" ,"DiElA"]
 
 list_to_submit = DoubleMuon
 
-##### Set true if jobs are not submitting after several days
+##### Set true if jobs are not submitting after several days
 resubmit_stuck =False
 
 #### IF YOU WISH TO PRODUCE A SECOND SAMPLE

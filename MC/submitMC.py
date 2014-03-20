@@ -8,7 +8,7 @@ type="MC"
 
 signallist_ee = ["Signal_EE", "HNEE50", "HNEE70", "HNEE90", "HNEE100", "HNEE125", "HNEE150", "HNEE175", "HNEE200","HNEE225","HNEE250","HNEE275","HNEE300","HNEE325","HNEE350","HNEE375","HNEE400","HNEE500","HNEE600", "HNEE700"]
 
-#### premade lists
+#### premade lists
 DY = ["DY", "DY10to50", "DY50plus"]
 QCD = ["QCD", "QCD_mumu", "QCD_30to40EE", "QCD_40EE"]
 QCD2 = ["QCD", "QCD_mu15", "QCD_15to20mu", "QCD_20to30mu", "QCD_30to50mu", "QCD_50to80mu", "QCD_80to120mu", "QCD_120to170mu", "QCD_170to300mu", "QCD_300to470mu", "QCD_470to600mu", "QCD_600to800mu", "QCD_800to1000mu", "QCD_1000mu", "QCD_20to30E", "QCD_30to80E", "QCD_80to170E", "QCD_170to250E", "QCD_250to350E", "QCD_350E"]
