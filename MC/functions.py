@@ -45,7 +45,7 @@ def makeConfigFile(dataset,  data, uidir, dir, sample):
     config+='### you have to specify the name as written in \n'
     config+='\n'
     config+='storage_element = T3_KR_UOS\n'
-    config+='user_remote_dir = Tag18/LQ_Mar14'+uidir+'\n'
+    config+='user_remote_dir = Tag18p1/LQ_Mar14'+uidir+'\n'
     config+='\n'
     config+='### To publish produced output in a local istance of DBS set publish_data = 1\n'
     config+='publish_data = 0\n'
