@@ -14,7 +14,8 @@ QCD2 = ["QCD", "QCD_mu15", "QCD_15to20mu", "QCD_20to30mu", "QCD_30to50mu", "QCD_
 dibosonlist = ["Diboson", "WW","WZ","ZZ"]
 ttbar = ["Top", "ttbar"]
 W = ["Wjet", "WJets"]
-
+SSlist = ["SSbkg", "SSWpWp","SSWmWm","WW_ds","TTW","TTZ","WWW"]
+Wg = ["WG","Wgamma"]
 
 ######### CHOOSE LIST FROM ABOVE
 list_to_submit = signallist_ee

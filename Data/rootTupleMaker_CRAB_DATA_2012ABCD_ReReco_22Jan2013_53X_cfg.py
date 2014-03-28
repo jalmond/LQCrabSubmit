@@ -174,7 +174,16 @@ addJetCollection(process,cms.InputTag('ak5PFJets'),
     genJetCollection = cms.InputTag("ak5GenJets") # Which GEN jets should be used?
 )
 
+
 #----------------------------------------------------------------------------------------------------
+# Make analysisPatJets and add them to the patDefaultSequence
+#----------------------------------------------------------------------------------------------------
+
+process.analysisPatJetsAK5PF = process.cleanPatJetsAK5PF.clone()
+process.analysisPatJetsAK5PF.finalCut = cms.string("abs(eta)<2.5 & pt > 20")
+process.patDefaultSequence.replace ( process.cleanPatJetsAK5PF, process.cleanPatJetsAK5PF + process.analysisPatJetsAK5PF )
+
+#----------------------------------------------------------------------------------------------------  
 # Add the pileup MVA to the PFJets
 #----------------------------------------------------------------------------------------------------
 
@@ -236,7 +245,7 @@ from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
 
 runMEtUncertainties(
     process,
-    jetCollection           = cms.InputTag('cleanPatJetsAK5PF'), 
+    jetCollection           = cms.InputTag('analysisPatJetsAK5PF'),
     doApplySysShiftCorr     = True,  # Apply correction for systematic x/y shift in MET
     doApplyType0corr        = True,  # Apply correction for pileup
     makeType1corrPFMEt      = True,  # Apply correction for jet energy scale
@@ -317,6 +326,14 @@ process.rootTuplePFMETType01XYCorJetResDown.InputTag      = cms.InputTag("patTyp
 process.rootTuplePFMETType01XYCorJetEnUp.InputTag         = cms.InputTag("patType1CorrectedPFMet")
 process.rootTuplePFMETType01XYCorJetEnDown.InputTag       = cms.InputTag("patType1CorrectedPFMet") 
 
+
+#----------------------------------------------------------------------------------------------------
+# This is data, so analyze the smeared PFJets by default
+#----------------------------------------------------------------------------------------------------
+
+process.rootTuplePFJets.InputTag = cms.InputTag('analysisPatJetsAK5PF')
+
+
 #----------------------------------------------------------------------------------------------------
 # Set Lepton-Gen Matching Parameters
 #----------------------------------------------------------------------------------------------------
@@ -341,7 +358,7 @@ process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 process.LJFilter.tauLabel  = cms.InputTag("cleanPatTaus")                        
 process.LJFilter.muLabel   = cms.InputTag("cleanPatMuons")
 process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
-process.LJFilter.jetLabel  = cms.InputTag("cleanPatJetsAK5PF")
+process.LJFilter.jetLabel  = cms.InputTag("analysisPatJetsAK5PF")
 process.LJFilter.muonsMin = 1
 process.LJFilter.muPT     = 15.0
 process.LJFilter.electronsMin = 1
