@@ -215,7 +215,7 @@ for i in list_to_submit:
             if not nresubmit== 1:
                 relist+= ","
             relist+= str(it)
-            if not it%400:
+            if not nresubmit%400:
                 stuck_fulllist.append(relist)
                 relist=""
 
