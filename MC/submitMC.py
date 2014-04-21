@@ -5,8 +5,6 @@ type="MC"
 
 ##### First entry is directory name
 
-signallist_ee = ["Signal_EE", "HNEE50", "HNEE70", "HNEE90", "HNEE100", "HNEE125", "HNEE150", "HNEE175", "HNEE200","HNEE225","HNEE250","HNEE275","HNEE300","HNEE325","HNEE350","HNEE375","HNEE400","HNEE500","HNEE600", "HNEE700"]
-
 #### premade lists
 DY = ["DY", "DY10to50", "DY50plus"]
 QCD = ["QCD", "QCD_mumu", "QCD_30to40EE", "QCD_40EE"]

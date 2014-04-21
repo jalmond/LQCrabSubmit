@@ -11,7 +11,7 @@ def makeConfigFile(dataset,   uidir, dir):
     config+='\n'
     config+='[CMSSW]\n'
     config+='\n'
-    config+='allow_nonproductioncmssw = 1\n'
+    #config+='allow_nonproductioncmssw = 1\n'
     config+='###### Majorana signal samples ######\n'
     config+='datasetpath=' + dataset + '\n'
     config+='\n'
