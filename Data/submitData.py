@@ -4,10 +4,10 @@ from functions import *
 type="Data"
 ##### First entry is directory name
 
-EMuons = ["ElectronMuon" ,"MuEGA"]
+EMuons = ["ElectronMuon" ,"MuEGA" ,"MuEGB","MuEGC","MuEGD"]
 Muons = ["SingleMuon" ,"MuA", "MuB", "MuC", "MuD"]
-DoubleMuon = ["DoubleMuon" ,"DiMuB","DiMuC","DiMuD"]
-DoubleElectron = ["DoubleElectron" ,"DiElA"]
+DoubleMuon = ["DoubleMuon" ,"DiMuA" ,"DiMuB","DiMuC","DiMuD"]
+DoubleElectron = ["DoubleElectron" ,"DiElA","DiElB","DiElC","DiElD"]
 
 list_to_submit = DoubleMuon
 
