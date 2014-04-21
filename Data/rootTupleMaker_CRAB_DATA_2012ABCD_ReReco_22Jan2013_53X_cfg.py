@@ -78,11 +78,18 @@ from PhysicsTools.PatAlgos.tools.trigTools import *
 # switch on the trigger matching
 switchOnTriggerMatching( process, triggerMatchers = [
        # electrons 
-        'cleanElectronTriggerMatchHLTSingleElectron',
+        'cleanElectronTriggerMatchHLTSingleElectron8',
+        'cleanElectronTriggerMatchHLTSingleElectron17',
         'cleanElectronTriggerMatchHLTSingleElectronWP80',
         'cleanElectronTriggerMatchHLTDoubleElectron',
-        # muons
+        # muons                                                                                                                                                           \
+                                                                                                                                                                           
         'cleanMuonTriggerMatchHLTSingleMuon',
+        'cleanMuonTriggerMatchHLTSingleMuon5',
+        'cleanMuonTriggerMatchHLTSingleMuon8',
+        'cleanMuonTriggerMatchHLTSingleMuon12',
+        'cleanMuonTriggerMatchHLTSingleMuon17',
+        'cleanMuonTriggerMatchHLTSingleMuon24',
         'cleanMuonTriggerMatchHLTDoubleMuon',
         'cleanMuonTriggerMatchHLTSingleIsoMuon'
 ] )
