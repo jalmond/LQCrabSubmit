@@ -64,7 +64,7 @@ for i in list_to_submit:
     if not (os.path.exists(cfgfile)):
         print "crab dir does not exist for this job. Making now"
         configfile=open(cfgfile,'w')
-        configfile.write(makeConfigFile(dataset, type, i, dir, i))
+        configfile.write(makeConfigFile(dataset, type, i, dir, i, 10000))
         configfile.close()
         os.system("crab -create -cfg " + cfgfile )
     ##### DOES THE JOB EXIST?

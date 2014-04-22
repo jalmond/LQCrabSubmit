@@ -1,4 +1,4 @@
-def makeConfigFile(dataset,  data, uidir, dir, sample):
+def makeConfigFile(dataset,  data, uidir, dir, sample, njobs):
 
     config='[CRAB]\n'
     config+='\n'
@@ -19,7 +19,7 @@ def makeConfigFile(dataset,  data, uidir, dir, sample):
     config+='\n'
     config+='### Splitting parameters\n'
     config+='total_number_of_events=-1\n'
-    config+='events_per_job = 10000\n'
+    config+='events_per_job = ' + str(njobs) +  '\n'
     config+='\n'
     config+='### The output files (comma separated list)\n'
     config+='output_file = file.root\n'
