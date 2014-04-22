@@ -47,6 +47,7 @@ HNMuMu700 /MajoranaNeutrinoToMuMu_M-700_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU
 WJets /WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM
 Wbb   /WbbJetsToLNu_Massive_TuneZ2star_8TeV-madgraph-pythia6_tauola/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM
 
+
 # DY samples
 DY10to50 /DYJetsToLL_M-10To50_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
 DY50plus /DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
