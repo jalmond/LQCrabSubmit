@@ -104,14 +104,14 @@ for i in list_to_submit:
         os.system("crab -status -c " + dir+ "/" +  i)
         os.system("crab -get -c " + dir+ "/" +  i)
         os.system("crab -status -c " + dir+ "/" +  i)
-        os.system("crab -status -c " +dir+ "/"  + i + " > log.txt") 
+        os.system("crab -status -c " +dir+ "/"  + i + " > log") 
 
 
         
         ##### check jobs that fail in output
         
         status_search = "Y   Retrieved         Cleared"
-        logfile = open("log.txt",'r')
+        logfile = open("log",'r')
 
         ##### LIST FOR RESUBMITTING FAILED JOBS
         resubmit_list = []
@@ -137,7 +137,7 @@ for i in list_to_submit:
 
         ###### CHECK FOR ABORTED JOBS
         status_search = "Y   Aborted           Aborted"
-        logfile = open("log.txt",'r')
+        logfile = open("log",'r')
         njob=0
         for line in logfile:
             if status_search in line:
@@ -180,7 +180,7 @@ for i in list_to_submit:
         ########## COUNT NUMBER OF RUNNING JOBS
         status_search = "N   Running"
         n_running=0
-        logfile = open("log.txt",'r')
+        logfile = open("log",'r')
         for line in logfile:
             if status_search in line:
                 n_running+=1
@@ -189,7 +189,7 @@ for i in list_to_submit:
 
         ######### ARE JOBS Cancelled
         status_search = "N   Cancelled"
-        logfile = open("log.txt",'r')
+        logfile = open("log",'r')
         stuck_list = []
         njob=0
         for line in logfile:
@@ -231,7 +231,7 @@ for i in list_to_submit:
             os.system(kill_command)
             os.system(resubmit_command)
             
-        os.system("rm log.txt")   
+        os.system("rm log")   
 
 n_failed=0        
 for jobs in not_complete:
