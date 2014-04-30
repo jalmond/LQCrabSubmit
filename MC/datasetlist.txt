@@ -1,15 +1,47 @@
 ##### signal
 ####  EMU
+HNEMU50 /MajoranaNeutrinoToEMu_M-50_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNEMU60 /MajoranaNeutrinoToEMu_M-60_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNEMU70 /MajoranaNeutrinoToEMu_M-70_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNEMU80 /MajoranaNeutrinoToEMu_M-80_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNEMU90 /MajoranaNeutrinoToEMu_M-90_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
 HNEMU100 /MajoranaNeutrinoToEMu_M-100_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
 HNEMU125 /MajoranaNeutrinoToEMu_M-125_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNEMU150 /MajoranaNeutrinoToEMu_M-150_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNEMU175 /MajoranaNeutrinoToEMu_M-175_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
 HNEMU200 /MajoranaNeutrinoToEMu_M-200_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNEMU225 /MajoranaNeutrinoToEMu_M-225_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
 HNEMU250 /MajoranaNeutrinoToEMu_M-250_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
 HNEMU275 /MajoranaNeutrinoToEMu_M-275_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
 HNEMU325 /MajoranaNeutrinoToEMu_M-325_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
 HNEMU375 /MajoranaNeutrinoToEMu_M-375_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
 HNEMU400 /MajoranaNeutrinoToEMu_M-400_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
 HNEMU500 /MajoranaNeutrinoToEMu_M-500_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
-HNEMU50 /MajoranaNeutrinoToEMu_M-50_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNEMU600 /MajoranaNeutrinoToEMu_M-600_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNEMU700 /MajoranaNeutrinoToEMu_M-700_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+
+HNMuE50  /MajoranaNeutrinoToMuE_M-50_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE100  /MajoranaNeutrinoToMuE_M-100_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE125  /MajoranaNeutrinoToMuE_M-125_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE150  /MajoranaNeutrinoToMuE_M-150_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE175  /MajoranaNeutrinoToMuE_M-175_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE200  /MajoranaNeutrinoToMuE_M-200_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE225  /MajoranaNeutrinoToMuE_M-225_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE250  /MajoranaNeutrinoToMuE_M-250_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE275  /MajoranaNeutrinoToMuE_M-275_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE300  /MajoranaNeutrinoToMuE_M-300_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE325  /MajoranaNeutrinoToMuE_M-325_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE350  /MajoranaNeutrinoToMuE_M-350_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE375  /MajoranaNeutrinoToMuE_M-375_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE400  /MajoranaNeutrinoToMuE_M-400_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE500  /MajoranaNeutrinoToMuE_M-500_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE600  /MajoranaNeutrinoToMuE_M-600_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE60  /MajoranaNeutrinoToMuE_M-60_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE700 /MajoranaNeutrinoToMuE_M-700_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE70  /MajoranaNeutrinoToMuE_M-70_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE80  /MajoranaNeutrinoToMuE_M-80_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+HNMuE90  /MajoranaNeutrinoToMuE_M-90_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+
 
 ####  EE
 HNEE40 /MajoranaNeutrinoToEE_M-40_TuneZ2star_8TeV-alpgen/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
@@ -107,15 +139,24 @@ WW /WW_TuneZ2star_8TeV_pythia6_tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSI
 SSWpWp /WpWpqq_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
 SSWmWm /WmWmqq_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
 WW_ds  /WW_DoubleScattering_8TeV-pythia8/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-TTW /TTWJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-TTZ /TTZJets_8TeV-madgraph_v2/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-WWW /WWWJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-ttWW  /TTWWJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+TTW    /TTWJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+TTZ    /TTZJets_8TeV-madgraph_v2/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+TTWW   /TTWWJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+WWW    /WWWJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+TTG    /TTGJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+TBZtoll	/TBZToLL_4F_TuneZ2star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+ZZZ	/ZZZNoGstarJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+WWG	/WWGJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+WZZ	/WZZNoGstarJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+WWZ	/WWZNoGstarJets_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+
 
 
 ####  HIGGS
-HtoZZ  /GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
-
+ggHtoZZ		/GluGluToHToZZTo4L_M-125_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+HtoZZ		/WH_ZH_TTH_HToWW_M-125_8TeV-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
+HtoWW		/WH_ZH_TTH_HToWW_M-125_8TeV-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM	
+HtotauTau  	/WH_ZH_TTH_HToTauTau_M-125_lepdecay_8TeV-pythia6-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM										
 
 ####  QCD
 QCD_mu15 /QCD_Pt_20_MuEnrichedPt_15_TuneZ2star_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v3/AODSIM
