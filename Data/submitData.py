@@ -4,16 +4,18 @@ from functions import *
 type="Data"
 ##### First entry is directory name
 
-EMuons = ["ElectronMuon" ,"MuEGA" ,"MuEGB","MuEGC","MuEGD"]
-Muons = ["SingleMuon" ,"MuA", "MuB", "MuC", "MuD"]
-DoubleMuon = ["DoubleMuon" ,"DiMuA" ,"DiMuB","DiMuC","DiMuD"]
-DoubleElectron = ["DoubleElectron" ,"DiElA","DiElB","DiElC","DiElD"]
+Muons = ["SingleMuon" , "MuC" , "MuD"]
+Electrons = ["SingleEL", "ElA", "ElB" , "ElC"]
 
-list_to_submit = DoubleMuon
+
+Electrons = ["SingleEl","ElD"]
+list_to_submit = Muons
+list_to_submit = Electrons
 
 #### IF YOU WISH TO PRODUCE A SECOND SAMPLE
 ### put any sample name in Extension and it will be resubmitted with new output name  
-Extension= "False"
+
+Extension= "True"
 ext="V1"
 
 
@@ -175,7 +177,7 @@ for i in list_to_submit:
             not_complete.append(i)
             os.system(resubmit_command)
 
-
+            
 
         ########## COUNT NUMBER OF RUNNING JOBS
         status_search = "N   Running"
@@ -187,7 +189,24 @@ for i in list_to_submit:
         logfile.close()
 
 
+        status_search="N   Created"
+        logfile = open("log.txt",'r')
+        created_list = []
+        njob=0
+        for line in logfile:
+            if status_search in line:
+                nstrips=0
+                for s in line.split():
+                    nstrips+=1
+                    if nstrips == 1:
+                        njob= int(s)
+                        created_list.append(njob)
+                        break
+        logfile.close()
+        
+        
         ######### ARE JOBS Cancelled
+
         status_search = "N   Cancelled"
         logfile = open("log.txt",'r')
         stuck_list = []
@@ -203,8 +222,26 @@ for i in list_to_submit:
                         break
         logfile.close()
                     
+        kill_exit_code =[]
+        kill_exit_code.append("60307")
+        kill_exit_code.append("8021")
+        kill_exit_code.append("60317")
 
-        
+        njob=0
+        logfile = open("log.txt",'r')
+        for line in logfile:
+            for exid in kill_exit_code:
+                if exid in line:
+                    if "SubSuccess" in line:
+                        print "Line for job kill;resubmit;  -- " + line
+                        nstrips=0
+                        for s in line.split():
+                            nstrips+=1
+                            if nstrips == 1:
+                                njob= int(s)
+                                stuck_list.append(njob)
+                                break
+                        
                 
         ############  RESUBMIT STUCK JOBS?
         stuck_fulllist = []
@@ -222,6 +259,23 @@ for i in list_to_submit:
         if not nresubmit == 0:
             stuck_fulllist.append(relist)
 
+
+        created_fulllist     = []
+        created_relist=""
+        n_created_submit=0
+        for it in created_list:
+            n_created_submit+=1
+            if not n_created_submit== 1:
+                created_relist+= ","
+            created_relist+= str(it)
+            if not n_created_submit%400:
+                created_fulllist.append(relist)
+                created_relist=""
+                n_created_submit=0
+        if not n_created_submit == 0:
+            created_fulllist.append(relist)
+
+
         for k in stuck_fulllist:
             kill_command = "crab -kill " + k + " -c " + dir+ "/" +  i
             resubmit_command = "crab -resubmit " + k + " -c " + dir+ "/" +  i
@@ -230,7 +284,15 @@ for i in list_to_submit:
             not_complete.append(i)
             os.system(kill_command)
             os.system(resubmit_command)
-            
+        
+        for k in created_fulllist:
+            submit_command = "crab -submit " + k + " -c " + dir+ "/" +  i
+            print submit_command
+            not_complete.append(i)
+            os.system(submit_command)
+
+       
+    
         os.system("rm log.txt")   
 
 n_failed=0        

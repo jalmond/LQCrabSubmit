@@ -7,7 +7,7 @@ type="MC"
 signallist_ee = ["Signal_EE", "HNEE50", "HNEE70", "HNEE90", "HNEE100", "HNEE125", "HNEE150", "HNEE175", "HNEE200","HNEE225","HNEE250","HNEE275","HNEE300","HNEE325","HNEE350","HNEE375","HNEE400","HNEE500","HNEE600", "HNEE700"]
 signallist_mm = ["Signal_MuMu", "HNMuMu50", "HNMuMu70", "HNMuMu90", "HNMuMu100", "HNMuMu125", "HNMuMu150", "HNMuMu175", "HNMuMu200","HNMuMu225","HNMuMu250","HNMuMu275","HNMuMu300","HNMuMu325","HNMuMu350","HNMuMu375","HNMuMu400","HNMuMu500","HNMuMu600", "HNMuMu700"]
 
-test = ["Signal_EE", "HNEE50"]
+test = ["Signal_EE", "HNEE40", "HNEE100", "HNEE400"]
 
 ######### CHOOSE LIST FROM ABOVE
 #list_to_submit = signallist_ee
@@ -17,8 +17,8 @@ list_to_submit=test
 ### Use extension ONLY if you are submitting a sample for a second time
 #######################################################################
 
-Extension= "False"
-ext="V1"
+Extension= "True"
+ext="v2015"
 
 ###### INITIALISE
 dir=""

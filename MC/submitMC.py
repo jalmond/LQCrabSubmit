@@ -6,24 +6,17 @@ type="MC"
 ##### First entry is directory name
 
 #### premade lists
-DY = ["DY", "DY10to50", "DY50plus"]
-QCD = ["QCD", "QCD_mumu", "QCD_30to40EE", "QCD_40EE"]
-QCD2 = ["QCD", "QCD_mu15", "QCD_15to20mu", "QCD_20to30mu", "QCD_30to50mu", "QCD_50to80mu", "QCD_80to120mu", "QCD_120to170mu", "QCD_170to300mu", "QCD_300to470mu", "QCD_470to600mu", "QCD_600to800mu", "QCD_800to1000mu", "QCD_1000mu", "QCD_20to30E", "QCD_30to80E", "QCD_80to170E", "QCD_170to250E", "QCD_250to350E", "QCD_350E"]
-dibosonlist = ["Diboson", "WW","WZ","ZZ"]
-ttbar = ["Top", "ttbar"]
-W = ["Wjet", "WJets"]
-SSlist = ["SSbkg", "SSWpWp","SSWmWm","WW_ds","TTW","TTZ","WWW"]
-Wg = ["WG","Wgamma"]
+ttbar = ["TT", "ttbar_new"]
 
 ######### CHOOSE LIST FROM ABOVE
-list_to_submit = signallist_ee
+list_to_submit = ttbar
 
 #######################################################################
 ### Use extension ONLY if you are submitting a sample for a second time
 #######################################################################
 
-Extension= "False"
-ext="V1"
+Extension= "True"
+ext="April16"
 
 ###### INITIALISE
 dir=""
@@ -175,7 +168,7 @@ for i in list_to_submit:
             not_complete.append(i)
             os.system(resubmit_command)
 
-
+         
         ########## COUNT NUMBER OF RUNNING JOBS             
         status_search = "N   Running"
         n_running=0
@@ -184,6 +177,22 @@ for i in list_to_submit:
             if status_search in line:
                 n_running+=1
         logfile.close()
+
+        status_search="N   Created"
+        logfile = open("log.txt",'r')
+        created_list = []
+        njob=0
+        for line in logfile:
+            if status_search in line:
+                nstrips=0
+                for s in line.split():
+                    nstrips+=1
+                    if nstrips == 1:
+                        njob= int(s)
+                        created_list.append(njob)
+                        break
+        logfile.close()
+
 
         ######### ARE JOBS cancelled?
         status_search = "N   Cancelled"
@@ -200,7 +209,27 @@ for i in list_to_submit:
                         stuck_list.append(njob)
                         break
         logfile.close()
-                    
+
+        kill_exit_code =[]
+        kill_exit_code.append("60307")
+        kill_exit_code.append("8021")
+        kill_exit_code.append("60317")
+
+        njob=0
+        logfile = open("log.txt",'r')
+        for line in logfile:
+            for exid in kill_exit_code:
+                if exid in line:
+                    if "SubSuccess" in line:
+                        print "Line for job kill;resubmit;  -- " + line
+                        nstrips=0
+                        for s in line.split():
+                            nstrips+=1
+                            if nstrips == 1:
+                                njob= int(s)
+                                stuck_list.append(njob)
+                                break
+
 
 
 
@@ -220,6 +249,22 @@ for i in list_to_submit:
         if not nresubmit == 0:
             stuck_fulllist.append(relist)
 
+
+        created_fulllist     = []
+        created_relist=""
+        n_created_submit=0
+        for it in created_list:
+            n_created_submit+=1
+            if not n_created_submit== 1:
+                created_relist+= ","
+            created_relist+= str(it)
+            if not n_created_submit%400:
+                created_fulllist.append(relist)
+                created_relist=""
+                n_created_submit=0
+        if not n_created_submit == 0:
+            created_fulllist.append(relist)
+
         for k in stuck_fulllist:
             kill_command = "crab -kill " + k + " -c " + dir+ "/" +  i
             resubmit_command = "crab -resubmit " + k + " -c " + dir+ "/" +  i
@@ -228,6 +273,12 @@ for i in list_to_submit:
             not_complete.append(i)
             os.system(kill_command)
             os.system(resubmit_command)
+        for k in created_fulllist:
+            submit_command = "crab -submit " + k + " -c " + dir+ "/" +  i
+            print submit_command
+            not_complete.append(i)
+            os.system(submit_command)
+
                 
         os.system("rm log.txt")   
 
