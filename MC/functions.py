@@ -15,7 +15,7 @@ def makeConfigFile(dataset,  data, uidir, dir, sample):
     config+='datasetpath=' + dataset + '\n'
     config+='\n'
     config+='### The ParameterSet you want to use\n'
-    config+='pset = rootTupleMaker_MC_2012_53X_chs_cfg.py\n' 
+    config+='pset = rootTupleMaker_MC_2012_53X_cfg.py\n' 
     config+='\n'
     config+='### Splitting parameters\n'
     config+='total_number_of_events=-1\n'

@@ -4,19 +4,19 @@ from functions import *
 type="Data"
 ##### First entry is directory name
 
-Muons = ["SingleMuon" , "MuC" , "MuD"]
-Electrons = ["SingleEL", "ElA", "ElB" , "ElC"]
+Muons = ["SingleMuon" ,"MuD","DiMuD"]
+#Muons = ["SingleMuon" ,"MuD"]
 
 
-Electrons = ["SingleEl","ElD"]
+
+
 list_to_submit = Muons
-list_to_submit = Electrons
 
 #### IF YOU WISH TO PRODUCE A SECOND SAMPLE
 ### put any sample name in Extension and it will be resubmitted with new output name  
 
 Extension= "True"
-ext="V1"
+ext="_loosept"
 
 
 ###### INITIALISE
@@ -103,8 +103,21 @@ for i in list_to_submit:
                 
     else:
         print "Crab job exists for this file: Add extension and resubmit?"
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        print "crab -status -c " + dir+ "/" +  i
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+
         os.system("crab -status -c " + dir+ "/" +  i)
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        print "crab -get -c " + dir+ "/" +  i
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         os.system("crab -get -c " + dir+ "/" +  i)
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        print "crab -status -c " + dir+ "/" +  i
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+
+        
         os.system("crab -status -c " + dir+ "/" +  i)
         os.system("crab -status -c " +dir+ "/"  + i + " > log.txt") 
 
@@ -152,7 +165,7 @@ for i in list_to_submit:
                         resubmit_list.append(njob)
                         break
         logfile.close()
-
+        
 
         ##### RESUBMIT JOBS (FAILED+ ABORTED)
         
@@ -223,10 +236,6 @@ for i in list_to_submit:
         logfile.close()
                     
         kill_exit_code =[]
-        kill_exit_code.append("60307")
-        kill_exit_code.append("8021")
-        kill_exit_code.append("60317")
-
         njob=0
         logfile = open("log.txt",'r')
         for line in logfile:

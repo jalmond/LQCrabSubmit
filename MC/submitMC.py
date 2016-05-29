@@ -6,10 +6,10 @@ type="MC"
 ##### First entry is directory name
 
 #### premade lists
-ttbar = ["TT", "ttbar_new"]
+DY = ["DY", "DY10to50" ,"DY50plus"]
 
 ######### CHOOSE LIST FROM ABOVE
-list_to_submit = ttbar
+list_to_submit = DY
 
 #######################################################################
 ### Use extension ONLY if you are submitting a sample for a second time
@@ -100,8 +100,17 @@ for i in list_to_submit:
                 
     else:
         print "Crab job exists for this file: Add extension and resubmit?"
+
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        print "crab -status -c " + dir+ "/" +  i
         os.system("crab -status -c " + dir+ "/" +  i)
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        print "crab -get -c " + dir+ "/" +  i
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         os.system("crab -get -c " + dir+ "/" +  i)
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        print "crab -status -c " + dir+ "/" +  i
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
         os.system("crab -status -c " + dir+ "/" +  i)
         os.system("crab -status -c " +dir+ "/"  + i + " > log.txt") 
         
@@ -211,10 +220,6 @@ for i in list_to_submit:
         logfile.close()
 
         kill_exit_code =[]
-        kill_exit_code.append("60307")
-        kill_exit_code.append("8021")
-        kill_exit_code.append("60317")
-
         njob=0
         logfile = open("log.txt",'r')
         for line in logfile:

@@ -30,7 +30,13 @@ process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
 # Output ROOT file
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string( "file.root" )
+
 )
+
+process.source = cms.Source ("PoolSource",
+                             fileNames=cms.untracked.vstring('file:/afs/cern.ch/work/j/jalmond/FE4C2F81-D0E1-E111-9080-0030487E0A2D.root'      ),
+                             #skipEvents=cms.untracked.uint32(993),
+                             )
 
 #----------------------------------------------------------------------------------------------------
 # Set global settings (number of events, global tag, input files, etc)
@@ -39,24 +45,19 @@ process.TFileService = cms.Service("TFileService",
 # GlobalTag
 process.GlobalTag.globaltag = 'START53_V27::All'
 
-# Events to process
-process.maxEvents.input = -1
+#process.maxEvents.input = 1
+process.source.eventsToProcess = cms.untracked.VEventRange( '1:58893:17664133')
 
-
-#process.readAK5PF    = cms.EDAnalyzer('JetCorrectorDBReader',  
- #       # below is the communication to the database 
-#        payloadName    = cms.untracked.string('AK5PF'),
-#        # this is used ONLY for the name of the printed txt files. You can use any name that you like, 
+process.readAK5PF    = cms.EDAnalyzer('JetCorrectorDBReader',  
+        # below is the communication to the database 
+        payloadName    = cms.untracked.string('AK5PF'),
+                             #        # this is used ONLY for the name of the printed txt files. You can use any name that you like, 
         # but it is recommended to use the GT name that you retrieved the files from.
-#        globalTag      = cms.untracked.string('START53_V27::All'),
-#        printScreen    = cms.untracked.bool(False),
-#        createTextFile = cms.untracked.bool(True)
-#                                      )
+        globalTag      = cms.untracked.string('START53_V27::All'),
+        printScreen    = cms.untracked.bool(False),
+        createTextFile = cms.untracked.bool(True)
+                                      )
 
-# Input files
-process.source.fileNames = [
-    'file:/afs/cern.ch/work/j/jalmond/FE4C2F81-D0E1-E111-9080-0030487E0A2D.root'
-]
 
 
 #----------------------------------------------------------------------------------------------------
@@ -178,7 +179,7 @@ process.cleanPatCandidates.replace ( process.cleanPatTaus, process.cleanPatTaus 
 #----------------------------------------------------------------------------------------------------
 
 process.analysisPatMuons = process.cleanPatMuons.clone()
-process.analysisPatMuons.finalCut = cms.string("isGlobalMuon & muonID('GlobalMuonPromptTight') & pt > 20")
+#process.analysisPatMuons.finalCut = cms.string("isGlobalMuon & muonID('GlobalMuonPromptTight') & pt > 20")
 
 process.cleanPatCandidates.replace ( process.cleanPatMuons, process.cleanPatMuons + process.analysisPatMuons )
 
@@ -187,7 +188,7 @@ process.cleanPatCandidates.replace ( process.cleanPatMuons, process.cleanPatMuon
 #----------------------------------------------------------------------------------------------------
 
 process.analysisPatElectrons = process.cleanPatElectrons.clone()
-process.analysisPatElectrons.finalCut = cms.string('userInt("HEEPId") < 0.5')
+#process.analysisPatElectrons.finalCut = cms.string('pt > 10')
 
 process.cleanPatCandidates.replace ( process.cleanPatElectrons, process.cleanPatElectrons + process.analysisPatElectrons )
 
@@ -223,7 +224,7 @@ process.patConversions = cms.EDProducer("PATConversionProducer",
 
 from PhysicsTools.PatAlgos.tools.jetTools import *
 
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
+#process.load("PhysicsTools.PatAlgos.patSequences_cff")
 
 process.load("Leptoquarks.RootTupleMakerV2.ak5PFchsJets_cff")
 #cms.Sequence() += process.ak5PFchsJetsSequence
@@ -235,14 +236,14 @@ addJetCollection(process,cms.InputTag('ak5PFchsJets'),
     doBTagging   = True , # Perform b-tagging and store b-tagging info in the jet
     doType1MET   = False, # Don't store Type1 PFMET information. This will be done by the runMEtUncertainties tool.
     jetIdLabel   = "ak5",# Which jet ID label should be used?
-    jetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L5Flavor']), # Which jet corrections should be used?
-    #jetCorrLabel = ('AK5PF', ['L1FastJet', 'L2Relative',  'L3Absolute']), # Which jet corrections should be used?
+    jetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute']), # Which jet corrections should be used?
+#    jetCorrLabel = ('AK5PF', ['L1FastJet', 'L2Relative',  'L3Absolute']), # Which jet corrections should be used?
     genJetCollection = cms.InputTag("ak5GenJets") # Which GEN jets should be used?
 )
 
-process.patJetCorrFactorsAK5PFchs.rho = cms.InputTag("kt6PFchsJets","rho")
-process.patJetCorrFactorsAK5PFchs.useRho = cms.bool(True)
-process.patJetCorrFactorsAK5PFchs.payload = cms.string('AK5PFchs')
+#process.patJetCorrFactorsAK5PFchs.rho = cms.InputTag("kt6PFchsJets","rho")
+#process.patJetCorrFactorsAK5PFchs.useRho = cms.bool(True)
+#process.patJetCorrFactorsAK5PFchs.payload = cms.string('AK5PFchs')
 
 #----------------------------------------------------------------------------------------------------
 # Make analysisPatJets and add them to the patDefaultSequence
@@ -318,6 +319,25 @@ runMEtUncertainties(
     muonCollection          = cms.InputTag('analysisPatMuons'),
     sysShiftCorrParameter   = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc
 )
+
+jetSmearFileName='PhysicsTools/PatUtils/data/pfJetResolutionMCtoDataCorrLUT.root'
+jetSmearHistogram='pfJetResolutionMCtoDataCorrLUT'
+
+import RecoMET.METProducers.METSigParams_cfi as jetResolutions
+
+process.smearedAnalysisPatJets = cms.EDProducer("SmearedPATJetProducer",
+            src = cms.InputTag("analysisPatJetsAK5PFchs"),
+            dRmaxGenJetMatch = cms.string('TMath::Min(0.5, 0.1 + 0.3*TMath::Exp(-0.05*(genJetPt - 10.)))'),
+            sigmaMaxGenJetMatch = cms.double(5.),
+            inputFileName = cms.FileInPath(jetSmearFileName),
+            lutName = cms.string(jetSmearHistogram),
+            jetResolutions = jetResolutions.METSignificance_params,
+            skipJetSelection = cms.string(
+        'jecSetsAvailable & abs(energy - correctedP4("Uncorrected").energy) > (5.*min(energy, correctedP4("Uncorrected").energy))'
+        ),
+                                         skipRawJetPtThreshold = cms.double(10.), # GeV                                                       
+                                         skipCorrJetPtThreshold = cms.double(1.e-2)
+        )
 
 #----------------------------------------------------------------------------------------------------
 # Available pat::MET collections for analysis
@@ -404,13 +424,18 @@ process.patType1CorrectedPFMetType01Only.srcType1Corrections = cms.VInputTag(
 # This is MC, so analyze the smeared PFJets by default
 #----------------------------------------------------------------------------------------------------
 
-process.rootTuplePFJets.InputTag = cms.InputTag('smearedAnalysisPatJetsAK5PFchs')
-process.rootTuplePFJets.InputTagSmearedUp   = cms.InputTag('smearedAnalysisPatJetsAK5PFchsResUp')                                 
-process.rootTuplePFJets.InputTagSmearedDown = cms.InputTag('smearedAnalysisPatJetsAK5PFchsResDown')                                 
-process.rootTuplePFJets.InputTagScaledUp    = cms.InputTag('shiftedAnalysisPatJetsAK5PFchsEnUpForCorrMEt')                                 
-process.rootTuplePFJets.InputTagScaledDown  = cms.InputTag('shiftedAnalysisPatJetsAK5PFchsEnDownForCorrMEt')     
-
-
+#process.rootTuplePFJets.InputTag = cms.InputTag('smearedAnalysisPatJetsAK5PFchs')
+#process.rootTuplePFJets.InputTag = cms.InputTag('smearedAnalysisPatJetsAK5PFchs')       
+#process.rootTuplePFJets.InputTag = cms.InputTag('analysisPatJetsAK5PFchs')
+process.rootTuplePFJets.InputTag = cms.InputTag('smearedAnalysisPatJets')
+#process.rootTuplePFJets.InputTagSmearedUp   = cms.InputTag('smearedAnalysisPatJetsAK5PFchsResUp')                                 
+#process.rootTuplePFJets.InputTagSmearedDown = cms.InputTag('smearedAnalysisPatJetsAK5PFchsResDown')                                 
+#process.rootTuplePFJets.InputTagScaledUp    = cms.InputTag('shiftedAnalysisPatJetsAK5PFchsEnUpForCorrMEt')                                 
+#process.rootTuplePFJets.InputTagScaledDown  = cms.InputTag('shiftedAnalysisPatJetsAK5PFchsEnDownForCorrMEt')     
+process.rootTuplePFJets.InputTagSmearedUp = cms.InputTag('smearedAnalysisPatJets')
+process.rootTuplePFJets.InputTagSmearedDown = cms.InputTag('smearedAnalysisPatJets')
+process.rootTuplePFJets.InputTagScaledUp    = cms.InputTag('smearedAnalysisPatJets')
+process.rootTuplePFJets.InputTagScaledDown  =  cms.InputTag('smearedAnalysisPatJets')
 #----------------------------------------------------------------------------------------------------
 # Set Lepton-Gen Matching Parameters
 #----------------------------------------------------------------------------------------------------
@@ -432,18 +457,18 @@ process.patTaus.genJetMatch = cms.InputTag("tauJetMatch")
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 
 #### Shared Muon/Electron/Tau Skim
-process.LJFilter.tauLabel  = cms.InputTag("cleanPatTaus")
+process.LJFilter.tauLabel  = cms.InputTag("cleanPatTaus")                        
 process.LJFilter.muLabel   = cms.InputTag("cleanPatMuons")
 process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
-process.LJFilter.jetLabel  = cms.InputTag("smearedAnalysisPatJetsAK5PFchs")
-process.LJFilter.muonsMin = 1
-process.LJFilter.muPT     = 15.0
-process.LJFilter.electronsMin = 1
-process.LJFilter.elecPT       = 15.0
-process.LJFilter.tausMin = 1
-process.LJFilter.tauPT   = 15.0
+process.LJFilter.jetLabel  = cms.InputTag("analysisPatJetsAK5PFchs")
+process.LJFilter.muonsMin = 0
+process.LJFilter.muPT     = 1.0
+process.LJFilter.electronsMin = 0
+process.LJFilter.elecPT       = 1.0
+process.LJFilter.tausMin = 0
+process.LJFilter.tauPT   = 1.0
 process.LJFilter.jetsMin = 0
-process.LJFilter.jetPT   = 20.0
+process.LJFilter.jetPT   = 1.0
 process.LJFilter.counteitherleptontype = True
 process.LJFilter.customfilterEMuTauJet2012 = False
 # -- WARNING :
@@ -546,7 +571,7 @@ process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi')
 
 process.p = cms.Path(
     # gen particle skimmer modules#
-#    process.readAK5PFchs*
+    #process.readAK5PF*
     process.ak5PFchsJetsSequence*
     process.genTausFromWs*
     process.genMuonsFromWs*
@@ -579,7 +604,7 @@ process.p = cms.Path(
     # Now the regular PAT default sequence
     process.patDefaultSequence*
     # Add the pileup MVA to the jets
-    #process.puJetIdSequence*
+    #process.puJetIdSqeuenceChs*
     # MET producers
     process.patMETsRawCalo*
     process.patMETsRawPF*
@@ -591,6 +616,7 @@ process.p = cms.Path(
     process.patConversions*
     # Re-run full HPS sequence to fully profit from the fix of high pT taus
     process.recoTauClassicHPSSequence*
+    process.smearedAnalysisPatJets*
     # RootTupleMakerV2
     (
     # Event information
