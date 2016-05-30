@@ -8,10 +8,13 @@ type="MC"
 #### premade lists
 ttbar = ["TT", "ttbar_new"]
 singleTop= ["SingleTop", "st_sch", "stbar_sch" , "st_tch", "stbar_tch", "st_tW" ,"stbar_tW"]
-
+V = ["V", "WJets","Wbb","DY10to50","DY50plus","Ztobb", "W1Jets","W2Jets","W3Jets","W4Jets"]
+VV = ["VV", "WZ","ZZ","WW", "TTZ","TTH","TTW"]
+QCD= ["QCD","QCD_mumu","QCD_20to30E","QCD_30to80E","QCD_80to170E","QCD_170to250E","QCD_250to350E","QCD_350E","QCD_30to40EE","QCD_40EE"]
 ######### CHOOSE LIST FROM ABOVE
-list_to_submit = singleTop
 
+list_to_submit = singleTop
+list_to_submit= VV
 #######################################################################
 ### Use extension ONLY if you are submitting a sample for a second time
 #######################################################################
