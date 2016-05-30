@@ -52,7 +52,7 @@ def makeConfigFile(dataset,   uidir, dir):
     config+='\n'
     config+='### To publish produced output in a local istance of DBS set publish_data = 1\n'
     config+='publish_data = 1\n'
-    config+='publish_data_name = LQNtupleSNU_Data_2016_loosept_'+uidir+'\n' 
+    config+='publish_data_name = LQNtupleSNU_Data_PF2PAT2016_'+uidir+'\n' 
     config+='\n'
     config+='#### Specify the dataset name. The full path will be <primarydataset>/<publish_data_name>/USER\n'
     config+='\n'

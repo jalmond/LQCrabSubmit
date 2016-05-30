@@ -4,7 +4,8 @@ from functionsCHS import *
 type="Data"
 ##### First entry is directory name
 
-Muons = ["SingleMuon" ,"MuD"]
+Muons = ["SingleMuon" ,"MuA", "MuB","MuC", "MuD"]
+Electrons = ["SingleElectron" ,"ElA", "ElB","ElC", "ElD"]
 
 
 list_to_submit = Muons
@@ -13,7 +14,7 @@ list_to_submit = Muons
 ### put any sample name in Extension and it will be resubmitted with new output name  
 
 Extension= "True"
-ext="_loosept"
+ext="_pf2pat"
 
 
 ###### INITIALISE

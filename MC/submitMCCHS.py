@@ -7,16 +7,17 @@ type="MC"
 
 #### premade lists
 ttbar = ["TT", "ttbar_new"]
+singleTop= ["SingleTop", "st_sch", "stbar_sch" , "st_tch", "stbar_tch", "st_tW" ,"stbar_tW"]
 
 ######### CHOOSE LIST FROM ABOVE
-list_to_submit = ttbar
+list_to_submit = singleTop
 
 #######################################################################
 ### Use extension ONLY if you are submitting a sample for a second time
 #######################################################################
 
 Extension= "True"
-ext="May16"
+ext="PF2PAT_v2"
 
 ###### INITIALISE
 dir=""

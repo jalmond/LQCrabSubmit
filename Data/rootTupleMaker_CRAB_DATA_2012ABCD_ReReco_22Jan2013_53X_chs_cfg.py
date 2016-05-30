@@ -1,364 +1,577 @@
-#----------------------------------------------------------------------------------------------------
-# Load PAT template
-#----------------------------------------------------------------------------------------------------
+##############################################################################################################
+#### configuration
+##############################################################################################################
+print '*' * 60   
+print "Configuration"
+print '*' * 60   
+##### specify if is Data
+isData=True
+runOnMC= not isData
+# list of input files                                                                                                                                           
 
-# Starting with a skeleton process which gets imported with the following line
+
+##############################################################################################################                                                             
+##### PRINT CONGURATION
+
+print '=' * 60  
+if isData:
+  print "Job is configured to run on data"
+else:
+  print"Job is configured to run on MC"
+print '=' * 60  
+
+#### Load job settings + cuts
+from Leptoquarks.RootTupleMakerV2.patRefSel_refMuJets import *
+
+
+# output file
+
+GLOBALTAG='FT53_V21A_AN6::All'
+
+print '=' * 40  
+print "Using Global Tag: "+GLOBALTAG
+
+
+
+### Particle flow                                                                                                                                                      
+postfix = "PF"
+
+typeIMetCorrections = True
+
+# event frequency of Fwk report
+fwkReportEvery = 1000
+
+# switch for 'TrigReport'/'TimeReport' at job end
+wantSummary = True
+
+################################################################################
+###                              End of constants                            ###
+###                                                                          ###
+### ======================================================================== ###
+###
+### Basic PAT/JOB configuration
+###
+
 from PhysicsTools.PatAlgos.patTemplate_cfg import *
-
-# Load PF isolation for muons and electrons
-from PhysicsTools.PatAlgos.tools.pfTools import *
-usePFIso ( process )
-
-# Remove MC matching *and* use the right JECs for data analysis 
-from PhysicsTools.PatAlgos.tools.coreTools import *
-runOnData( process )
-
-# Options and Output Report
-process.options.wantSummary = False
-
-import os
-
-############## IMPORTANT ########################################
-# If you run over many samples and you save the log, remember to reduce
-# the size of the output by prescaling the report of the event number
-process.MessageLogger.cerr.FwkReport.reportEvery = 1
-process.MessageLogger.cerr.default.limit = 10
-#################################################################
-
-#----------------------------------------------------------------------------------------------------
-# Load our RootTupleMakerV2 modules
-#----------------------------------------------------------------------------------------------------
-
-process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
-
-# Output ROOT file
-process.TFileService = cms.Service("TFileService",
-    fileName = cms.string( 'rootTupleMaker_CRAB_DATA_2012_53X.root' )
-)
-
-#----------------------------------------------------------------------------------------------------
-# Set global settings (number of events, global tag, input files, etc)
-#----------------------------------------------------------------------------------------------------
 
 # GlobalTag
 process.GlobalTag.globaltag = 'FT53_V21A_AN6::All'
 
-# Events to process
+# Input files                                                                                                                                                             
 process.maxEvents.input = -1
+#process.source.fileNames = inputFiles
 
-# Input files
-process.source.fileNames = [
-    'root://eoscms//eos/cms/store/user/hsaka/2012prep/Run2012A_SingleElectron_AOD_22Jan2013-v1_20000_EA28F8B2-AE72-E211-97F0-0025901D4938.root'
-]
+#### Load module for good vertex 
+#process.load( "Leptoquarks.RootTupleMakerV2.patRefSel_goodVertex_cfi" )
+########################################################################
+### Check JECs
+########################################################################
+jecLevels = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual'])
 
-#----------------------------------------------------------------------------------------------------
-# HEEP 4.0 (electron ID) still uses the 2011 definitions of rho for isolation corrections.
-# 
-# Recipe taken from here:
-# https://twiki.cern.ch/twiki/bin/view/CMS/EgammaEARhoCorrection#Rho_for_2011_Effective_Areas
-#----------------------------------------------------------------------------------------------------
+print "JEC = " + str(jecLevels)
+print '=' * 40
 
-process.load("RecoJets.JetProducers.kt4PFJets_cfi")
-process.kt6PFJetsForHEEPIsolation = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-process.kt6PFJetsForHEEPIsolation.Rho_EtaMax = cms.double(2.5)
 
-#----------------------------------------------------------------------------------------------------
-# Turn on trigger matching
-# 
-# Example taken from PAT SWGuide twiki
-# https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTriggerMatchExercise#TrigProduce
-#
-# Don't include this line (recommended by instructions): removeCleaningFromTriggerMatching( process )
-# It will break the matching.
-#----------------------------------------------------------------------------------------------------
+from PhysicsTools.SelectorUtils.pvSelector_cfi import pvSelector
 
-# load the PAT trigger Python tools
+process.goodOfflinePrimaryVertices = cms.EDFilter("PrimaryVertexObjectFilter",
+    filterParams = pvSelector.clone(
+        minNdof = cms.double(4.0),
+        maxZ = cms.double(24.0)
+        ),
+                                                  filter       = cms.bool( False ),
+                                                  src = cms.InputTag('offlinePrimaryVertices')
+                                                  )
+
+process.step0b = process.goodOfflinePrimaryVertices.clone( filter = True )
+
+
+### Add in type - corrections
+##____________________________________________________________________________||
+
+print '-' * 40
+process.load("PhysicsTools.PatUtils.patPFMETCorrections_cff")
+print "Changing producePatPFMETCorrections: Adding type0PFMEtCorrection + patPFMETtype0Corr to sequence. This is needed to apply type 0 corrections "
+print '-' * 40
+
+process.producePatPFMETCorrections.replace(
+  process.pfCandMETcorr,
+  process.type0PFMEtCorrection *
+  process.patPFMETtype0Corr *
+  process.pfCandMETcorr 
+  )
+
+print '*' * 60
+print "Setting up usePF2PAT"
+print '*' * 60
+
+from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
+usePF2PAT( process, runPF2PAT           = True, runOnMC = False, jetAlgo = jetAlgo, postfix             = postfix, jetCorrections      = ( jecLevels) , typeIMetCorrections = typeIMetCorrections, pvCollection        = cms.InputTag( pfVertices ))
+
+print "\n" *2
+print "usePF2PAT( process , runPF2PAT           = True         , runOnMC             = runOnMC         , jetAlgo             ="+ jetAlgo +"        , postfix             = "+postfix +"        , jetCorrections      = ( "+                             str(jecLevels)  +"                               )         , typeIMetCorrections = "+str(typeIMetCorrections)      +"   , pvCollection        = cms.InputTag( "+pfVertices+" )         )"
+print "\n" *2
+print '*' * 60
+print "Finished setting up usePF2PAT"
+print '*' * 60
+
+postfixLoose='PFLoose'
+from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
+usePF2PAT( process
+         , runPF2PAT           = True
+         , runOnMC             = runOnMC
+         , jetAlgo             = jetAlgo
+         , postfix             = postfixLoose
+         , jetCorrections      = (
+                                 jecLevels
+                                 )
+         , typeIMetCorrections = typeIMetCorrections
+         , pvCollection        = cms.InputTag( pfVertices )
+         )
+print "\n" *2
+print "usePF2PAT( process , runPF2PAT           = True         , runOnMC             = runOnMC         , jetAlgo             ="+ jetAlgo +"        , postfix             = "+postfixLoose +"        , jetCorrections      = ( "+                             str(jecLevels)  +"                               )         , typeIMetCorrections = "+str(typeIMetCorrections)      +"   , pvCollection        = cms.InputTag( "+pfVertices+" )         )"
+print "\n" *2
+print '*' * 60
+print "Finished setting up usePF2PATLoose"
+print '*' * 60
+
+
+
+## pile up corrections
+from CommonTools.ParticleFlow.Tools.enablePileUpCorrection import *
+#enablePileUpCorrectionInPF2PAT( process, postfix, sequence = "patPF2PATSequence"+postfix)
+enablePileUpCorrection( process, postfix, sequence = "patPF2PATSequence"+postfix)
+
+print '=' * 60
+print "Ran enablePileUpCorrection: 'CommonTools.ParticleFlow.Tools.enablePileUpCorrection'"
+print '=' * 60
+################################################
+################################################   ADD TOP PROJECTION CUTS TO PF Objects
+################################################
+
+print '=' * 60
+print "----- pfMuons: setting cuts for top projection: Warning need to loosen isolation in PFLoose collection for analysis"
+print "+++++++ "
+print "process.pfSelectedMuonsPF.cut = 'abs(eta)<2.5 && pt>10.'"
+print "process.pfIsolatedMuonsPF.doDeltaBetaCorrection = True"
+print "process.pfIsolatedMuonsPF.deltaBetaFactor = -0.5"
+print "process.pfIsolatedMuonsPF.isolationCut = 0.20"
+print '=' * 60
+
+#### for top projection
+getattr( process, 'pfSelectedMuons' + postfix ).cut = 'abs(eta)<2.5 && pt>10.'
+getattr( process, 'pfIsolatedMuons' + postfix ).doDeltaBetaCorrection = True
+getattr( process, 'pfIsolatedMuons' + postfix ).deltaBetaFactor = -0.5
+getattr( process, 'pfIsolatedMuons' + postfix ).isolationCut = 0.20
+### Loose
+print "process.pfSelectedMuonsPFLoose.cut = 'abs(eta)<2.5 && pt>10.'"
+print "process.pfIsolatedMuonsPFLoose.doDeltaBetaCorrection = True"
+print "process.pfIsolatedMuonsPFLoose.deltaBetaFactor = -0.5"
+print "process.pfIsolatedMuonsPFLoose.isolationCut = 0.50"
+getattr( process, 'pfSelectedMuons' + postfixLoose ).cut = 'abs(eta)<2.5 && pt>10.'
+getattr( process, 'pfIsolatedMuons' + postfixLoose ).doDeltaBetaCorrection = True
+getattr( process, 'pfIsolatedMuons' + postfixLoose ).deltaBetaFactor = -0.5
+getattr( process, 'pfIsolatedMuons' + postfixLoose ).isolationCut = 0.50
+
+
+print '=' * 60
+print "----- pfElectrons: setting cuts for top projections"
+print "WARNING: These cuts are too tight for analysis. Need to make new patElectronLoose collection with looser pt and isolation"
+print '=' * 60
+
+process.load( "EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi" )
+process.load('EgammaAnalysis.ElectronTools.electronIsolatorFromEffectiveArea_cfi')
+
+process.pfIdentifiedElectronsPF = cms.EDFilter("ElectronIDPFCandidateSelector",
+                                              recoGsfElectrons = cms.InputTag("gsfElectrons"),
+                                              electronIdMap = cms.InputTag("mvaTrigV0"),
+                                              electronIdCut = cms.double(0.0),
+                                              src = cms.InputTag("pfElectronsFromVertex"+postfix))
+
+getattr( process, 'pfSelectedElectrons' + postfix).src = 'pfIdentifiedElectrons'+postfix
+getattr( process, 'pfSelectedElectrons' + postfix).cut = 'abs(eta)<2.5 && pt>20. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits<2'
+print "pfSelectedElectronsPF.cut = 'abs(eta)<2.5 && pt>20. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits<2'"
+getattr( process, 'pfIsolatedElectrons' + postfix).isolationValueMapsCharged  = cms.VInputTag(cms.InputTag("elPFIsoValueCharged03PFId"+postfix))
+getattr( process, 'pfIsolatedElectrons' + postfix).isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("elPFIsoValueNeutral03PFId"+postfix),
+                                                                      cms.InputTag("elPFIsoValueGamma03PFId"+postfix))
+
+process.elPFIsoValueEA03.pfElectrons = cms.InputTag('pfSelectedElectrons' + postfix)
+getattr( process, 'pfIsolatedElectrons' + postfix).deltaBetaIsolationValueMap = 'elPFIsoValueEA03' # new Effective Area edm::ValueMap 
+getattr( process, 'pfIsolatedElectrons' + postfix).doDeltaBetaCorrection = True                    # not really a 'deltaBeta' correction, but it serves  
+getattr( process, 'pfIsolatedElectrons' + postfix).deltaBetaFactor = -1.0
+getattr( process, 'pfIsolatedElectrons' + postfix).isolationCut = 0.15
+print "pfIsolatedElectronsPF.isolationCut = 0.15"
+
+process.patPF2PATSequencePF.replace( process.pfSelectedElectronsPF,
+                                   process.pfIdentifiedElectronsPF + process.pfSelectedElectronsPF  + process.elPFIsoValueEA03)
+#### Loose
+
+process.pfIdentifiedElectronsPFLoose = cms.EDFilter("ElectronIDPFCandidateSelector",
+                                              recoGsfElectrons = cms.InputTag("gsfElectrons"),
+                                              electronIdMap = cms.InputTag("mvaTrigV0"),
+                                              electronIdCut = cms.double(0.0),
+                                              src = cms.InputTag("pfElectronsFromVertex"+postfixLoose))
+
+getattr( process, 'pfSelectedElectrons' + postfixLoose ).src = 'pfIdentifiedElectrons'+postfixLoose
+getattr( process, 'pfSelectedElectrons' + postfixLoose ).cut = 'abs(eta)<2.5 && pt>10. && gsfTrackRef.isNonnull && gsfTrackRef.trackerExpectedHitsInner.numberOfLostHits<2'
+
+getattr( process, 'pfIsolatedElectrons' + postfixLoose ).isolationValueMapsCharged  = cms.VInputTag(cms.InputTag("elPFIsoValueCharged03PFId"+postfixLoose))
+getattr( process, 'pfIsolatedElectrons' + postfixLoose ).isolationValueMapsNeutral = cms.VInputTag(cms.InputTag("elPFIsoValueNeutral03PFId"+postfixLoose),
+                                                                      cms.InputTag("elPFIsoValueGamma03PFId"+postfixLoose))
+
+process.elPFIsoValueEA03Loose = process.elPFIsoValueEA03.clone()
+process.elPFIsoValueEA03Loose.pfElectrons = cms.InputTag('pfSelectedElectrons' + postfixLoose)
+getattr( process, 'pfIsolatedElectrons' + postfixLoose ).deltaBetaIsolationValueMap = 'elPFIsoValueEA03Loose' # new Effective Area edm::ValueMap    
+getattr( process, 'pfIsolatedElectrons' + postfixLoose ).doDeltaBetaCorrection = True                    # not really a 'deltaBeta' correction, but it serves 
+getattr( process, 'pfIsolatedElectrons' + postfixLoose ).deltaBetaFactor = -1.0
+getattr( process, 'pfIsolatedElectrons' + postfixLoose ).isolationCut = 0.5
+print "pfIsolatedElectronsPFLoose.isolationCut = 0.5"
+
+
+process.patPF2PATSequencePFLoose.replace( process.pfSelectedElectronsPFLoose,
+                                   process.pfIdentifiedElectronsPFLoose + process.pfSelectedElectronsPFLoose + process.elPFIsoValueEA03Loose )
+
+
+print '=' * 60
+print "----- PATElectron isolation: Settinig 03 cone isolation as default"
+print '=' * 60
+getattr( process, 'patElectrons' + postfix ).isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' + postfix )
+getattr( process, 'patElectrons' + postfix ).isolationValues.pfChargedAll       = cms.InputTag( 'elPFIsoValueChargedAll03PFId' + postfix )
+getattr( process, 'patElectrons' + postfix ).isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' + postfix )
+getattr( process, 'patElectrons' + postfix ).isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' + postfix )
+getattr( process, 'patElectrons' + postfix ).isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' + postfix )
+getattr( process, 'patElectrons' + postfix ).isolationValues.user =   cms.VInputTag(cms.InputTag("elPFIsoValueEA03"),"elPFIsoValueCharged04PFIdPF","elPFIsoValueNeutral04PFIdPF","elPFIsoValueGamma04PFIdPF","elPFIsoValuePU04PFIdPF","elPFIsoValueChargedAll04PFIdPF")
+
+getattr( process, 'patElectrons' + postfixLoose ).isolationValues.pfNeutralHadrons   = cms.InputTag( 'elPFIsoValueNeutral03PFId' + postfixLoose )
+getattr( process, 'patElectrons' + postfixLoose ).isolationValues.pfChargedAll       = cms.InputTag( 'elPFIsoValueChargedAll03PFId' + postfixLoose )
+getattr( process, 'patElectrons' + postfixLoose ).isolationValues.pfPUChargedHadrons = cms.InputTag( 'elPFIsoValuePU03PFId' + postfixLoose )
+getattr( process, 'patElectrons' + postfixLoose ).isolationValues.pfPhotons          = cms.InputTag( 'elPFIsoValueGamma03PFId' + postfixLoose )
+getattr( process, 'patElectrons' + postfixLoose ).isolationValues.pfChargedHadrons   = cms.InputTag( 'elPFIsoValueCharged03PFId' + postfixLoose )
+getattr( process, 'patElectrons' + postfixLoose ).isolationValues.user =   cms.VInputTag(cms.InputTag("elPFIsoValueEA03Loose"),"elPFIsoValueCharged04PFIdPFLoose","elPFIsoValueNeutral04PFIdPFLoose","elPFIsoValueGamma04PFIdPFLoose","elPFIsoValuePU04PFIdPFLoose","elPFIsoValueChargedAll04PFIdPFLoose")
+
+
+print '=' * 60
+print "----- Set up electron PATConversionProducer + MVA electron ID"
+print '=' * 60
+process.patConversions = cms.EDProducer("PATConversionProducer",
+    electronSource = cms.InputTag('selectedPatElectrons' + postfix)
+)
+
+# MVA electron ID                                                                                                                                                       
+process.eidMVASequence = cms.Sequence(
+  process.mvaTrigV0
++ process.mvaNonTrigV0
+)
+
+print '=' * 60
+print "----- Turn on Top Projection"
+print '=' * 60
+# top projections in PF2PAT:
+getattr(process,"pfNoPileUp"+postfix).enable = True
+getattr(process,"pfNoMuon"+postfix).enable = True
+getattr(process,"pfNoElectron"+postfix).enable = True
+getattr(process,"pfNoTau"+postfix).enable = False
+getattr(process,"pfNoJet"+postfix).enable = True
+# verbose flags for the PF2PAT modules
+getattr(process,"pfNoMuon"+postfix).verbose = False
+
+print 'getattr(process,"pfNoPileUp"+postfix).enable = True'
+print 'getattr(process,"pfNoMuon"+postfix).enable = True'
+print 'getattr(process,"pfNoElectron"+postfix).enable = True'
+print 'getattr(process,"pfNoTau"+postfix).enable = False'
+print 'getattr(process,"pfNoJet"+postfix).enable = True'
+
+
+
+
+## LOADING Ntuple modules
+process.load('Leptoquarks.RootTupleMakerV2.Ntuple_cff')
+
+# Output ROOT file                                                                                                                                                        
+process.TFileService = cms.Service("TFileService",
+    fileName = cms.string( 'rootTupleMaker_CRAB_DATA_2012_53X.root' )
+)
+
+# load the PAT trigger Python tools                                                                                                                                            
 from PhysicsTools.PatAlgos.tools.trigTools import *
-
-# switch on the trigger matching
-switchOnTriggerMatching( process, triggerMatchers = [
-       # electrons 
-        'cleanElectronTriggerMatchHLTSingleElectron8',
+switchOnTriggerMatching( process, sequence = "patPF2PATSequence"+postfix , triggerMatchers = [
+     'cleanElectronTriggerMatchHLTSingleElectron8',
         'cleanElectronTriggerMatchHLTSingleElectron17',
-        'cleanElectronTriggerMatchHLTSingleElectronWP80',
+     'cleanElectronTriggerMatchHLTSingleElectronWP80',
         'cleanElectronTriggerMatchHLTDoubleElectron',
-        # muons                                                                                                                                                           \
-                                                                                                                                                                           
-        'cleanMuonTriggerMatchHLTSingleMuon',
+     'cleanMuonTriggerMatchHLTSingleMuon',
         'cleanMuonTriggerMatchHLTSingleMuon5',
         'cleanMuonTriggerMatchHLTSingleMuon8',
         'cleanMuonTriggerMatchHLTSingleMuon12',
         'cleanMuonTriggerMatchHLTSingleMuon17',
         'cleanMuonTriggerMatchHLTSingleMuon24',
         'cleanMuonTriggerMatchHLTDoubleMuon',
-        'cleanMuonTriggerMatchHLTSingleIsoMuon'
-] )
+        'cleanMuonTriggerMatchHLTSingleIsoMuon'] )
 
-#----------------------------------------------------------------------------------------------------
-# Add PFMET and TCMET
-# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#MET_Tools
-#----------------------------------------------------------------------------------------------------
 
-from PhysicsTools.PatAlgos.tools.metTools import *
-addPfMET(process, 'PF') # This adds Type1-corrected PFMET
-addTcMET(process, 'TC') # This adds raw TC MET
+from PhysicsTools.PatAlgos.tools.coreTools import *
 
-#----------------------------------------------------------------------------------------------------
-# Add MET filters
-#----------------------------------------------------------------------------------------------------
+
+##### LOAD predefined selections cuts
+from Leptoquarks.RootTupleMakerV2.patRefSel_ch_cfi import *
+
+# remove MC matching, object cleaning, objects etc.
+if isData:
+  runOnData( process
+           , names = [ 'PFAll' ]
+           , postfix = postfix
+           )
+
+
+# additional event content has to be (re-)added _after_ the call to 'removeCleaning()':
+process.out.outputCommands += [ 'keep edmTriggerResults_*_*_*'
+                                ,                                 'keep *_elPFIsoValueEA03_*_*'
+                              , 'keep *_hltTriggerSummaryAOD_*_*'
+                              # vertices and beam spot
+                              , 'keep *_offlineBeamSpot_*_*'
+                              , 'keep *_offlinePrimaryVertices*_*_*'
+                              , 'keep *_goodOfflinePrimaryVertices*_*_*'
+                              ]
+
+#process.out.outputCommands += ['drop *_hpsPFTauDiscrimination_*_*']
+                               
+
+###
+### Additional configuration
+###
+
+
+### ELectrons (not really needed any more)
+intermediatePatElectrons.src = cms.InputTag( 'selectedPatElectrons' + postfixLoose )
+setattr( process, 'intermediatePatElectrons' + postfix, intermediatePatElectrons )
+### Muons
+process.out.outputCommands.append( 'keep *_pfMuonsFromVertex*_*_*' )
+
+###
+### Selection configuration
+###
+
+### Muons
+
+# Use the good primary vertices everywhere. (This is done a few times), but no harm in taht
+for imod in [process.patMuonsPF,
+             process.patMuonsPFLoose,
+             process.patElectronsPFLoose,
+             process.patElectronsPF]:
+    imod.pvSrc = "goodOfflinePrimaryVertices"
+    imod.embedTrack = True
+    imod.usePV = False
+
+### Basic pt and eta cut for us in jet smearing tool 
+getattr( process, 'selectedPatMuons' + postfix ).cut = LQmuonCut
+getattr( process, 'selectedPatMuons' + postfixLoose ).cut = LQmuonCut
+
+### Add user isolation (so we have both dr cones)
+getattr( process, 'patMuons' + postfix ).user = cms.VInputTag("muPFIsoValueCharged03PF","muPFIsoValueNeutral03PF","muPFIsoValueGamma03PF","muPFIsoValuePU03PF","muPFIsoValueChargedAll03PF")
+getattr( process, 'patMuons' + postfixLoose ).user = cms.VInputTag("muPFIsoValueCharged03PF","muPFIsoValueNeutral03PF","muPFIsoValueGamma03PF","muPFIsoValuePU03PF","muPFIsoValueChargedAll03PF")
+
+### Jets Apply loose pt cuts on jets
+getattr( process, 'selectedPatJets'  + postfix ).cut = LQJetCut
+
+### Electrons
+getattr( process, 'selectedPatElectrons' + postfix ).cut = LQelectronCut
+getattr( process, 'selectedPatElectrons' + postfixLoose ).cut = LQelectronCut
+
+# change PV in Jet corrector                                                                                                                                     
+for module in [
+               process.patJetCorrFactorsPF
+               ]:
+    module.primaryVertices = "goodOfflinePrimaryVertices"
+
+
+# Options and Output Report                                                                                                                                      
+process.options.wantSummary = wantSummary
+
+import os
+
+############## IMPORTANT ########################################                                                                                                
+# If you run over many samples and you save the log, remember to reduce                                                                                          
+# the size of the output by prescaling the report of the event number                                                                                            
+process.MessageLogger.cerr.FwkReport.reportEvery = fwkReportEvery
+process.MessageLogger.cerr.default.limit = 10
+################################################################
+
+print "TEST"
+#Input files
+process.source.fileNames = [
+  'root://xrootd.unl.edu//store/data/Run2012A/SingleMu/AOD/22Jan2013-v1/20000/002F5062-346F-E211-BF00-1CC1DE04DF20.root'
+]
+
+print "TEST"
+process.load("RecoJets.JetProducers.kt4PFJets_cfi")
+process.kt6PFJetsForHEEPIsolation = process.kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+process.kt6PFJetsForHEEPIsolation.Rho_EtaMax = cms.double(2.5)
+
+#----------------------------------------------------------------------------------------------------                                                            
+# Add MET filters                                                                                                                                                
+#----------------------------------------------------------------------------------------------------                                                            
 
 process.load("Leptoquarks.RootTupleMakerV2.metFilters_cfi")
 
-#----------------------------------------------------------------------------------------------------
-# Rerun full HPS sequence to fully profit from the fix of high pT taus
-#----------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------                                                                
+# Rerun full HPS sequence to fully profit from the fix of high pT taus         
+                                                                                   
+#----------------------------------------------------------------------------------------------------                                                                
 
 process.load("RecoTauTag.Configuration.RecoPFTauTag_cff")
+#---------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------                                                            
+# Rerun full HPS sequence to fully profit from the fix of high pT taus                                                                                           
+#----------------------------------------------------------------------------------------------------                                                            
 
-#----------------------------------------------------------------------------------------------------
-# Modify cleanPatTaus (HPS Taus) - loosen up a bit
-# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/PhysicsTools/PatAlgos/python/cleaningLayer1/tauCleaner_cfi.py?revision=1.11&view=markup
-#----------------------------------------------------------------------------------------------------
+getattr( process, 'selectedPatTaus' + postfix ).cut = cms.string("pt > 10. && tauID('decayModeFinding')> 0.5")
+getattr( process, 'selectedPatTaus' + postfix ).preselection = cms.string(' tauID("decayModeFinding") > 0.5 ')
+getattr( process, 'selectedPatTaus' + postfix ).finalCut     = cms.string(' pt > 15.0 & abs(eta) < 2.5      ')
 
-process.cleanPatTaus.preselection = cms.string(' tauID("decayModeFinding") > 0.5 ')
-process.cleanPatTaus.finalCut     = cms.string(' pt > 15.0 & abs(eta) < 2.5      ')
-
-#----------------------------------------------------------------------------------------------------
-# Add Tau ID sources (HPS Taus)
-#----------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------                                                                
+# Add Tau ID sources (HPS Taus)                                                   
+                                                                                   
+#----------------------------------------------------------------------------------------------------                                                                
 
 from PhysicsTools.PatAlgos.tools.tauTools import *
 switchToPFTauHPS(process)
 
-#----------------------------------------------------------------------------------------------------
-# Add MVA electron ID
-#
-# MVA electron ID details on this twiki:
-# https://twiki.cern.ch/twiki/bin/view/CMS/MultivariateElectronIdentification#MVA_based_Id_in_PAT
-#
-# Taken from the example:
-# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/EgammaAnalysis/ElectronTools/test/patTuple_electronId_cfg.py?revision=1.2&view=markup&pathrev=V00-00-09
-#----------------------------------------------------------------------------------------------------
 
-process.load('EgammaAnalysis.ElectronTools.electronIdMVAProducer_cfi')
-process.mvaID = cms.Sequence(  process.mvaTrigV0 + process.mvaTrigNoIPV0 + process.mvaNonTrigV0 )
-process.patElectrons.electronIDSources.mvaTrigV0     = cms.InputTag("mvaTrigV0")  
-process.patElectrons.electronIDSources.mvaNonTrigV0  = cms.InputTag("mvaNonTrigV0") 
-process.patElectrons.electronIDSources.mvaTrigNoIPV0 = cms.InputTag("mvaTrigNoIPV0")
+#----------------------------------------------------------------------------------------------------                                                            
+# Add the HEEP ID bit to the electrons                                                                                                                           
+#----------------------------------------------------------------------------------------------------                                                            
 
-process.patConversions = cms.EDProducer("PATConversionProducer",
-    electronSource = cms.InputTag("cleanPatElectrons")  
+from SHarper.HEEPAnalyzer.HEEPSelectionCuts_cfi import *
+process.HEEPId = cms.EDProducer("HEEPIdValueMapProducer",
+                                eleLabel = cms.InputTag("gsfElectrons"),
+                                barrelCuts = cms.PSet(heepBarrelCuts),
+                                endcapCuts = cms.PSet(heepEndcapCuts),
+                                eleIsolEffectiveAreas = cms.PSet(heepEffectiveAreas),
+                                eleRhoCorrLabel = cms.InputTag("kt6PFJetsForIsolation","rho"),
+                                applyRhoCorrToEleIsol = cms.bool(True),
+                                verticesLabel = cms.InputTag("offlinePrimaryVerticesWithBS"),
+                                writeIdAsInt =cms.bool(True)
+                                )
+getattr( process, 'patElectrons' + postfix ).userData.userInts.src = cms.VInputTag('HEEPId')
+getattr( process, 'patElectrons' + postfix ).electronIDSources = electronIDSources
+getattr( process, 'patElectrons' + postfixLoose ).electronIDSources = electronIDSources
+getattr( process, 'patElectrons' + postfixLoose ).userData.userInts.src = cms.VInputTag('HEEPId')
+
+######################################## 
+
+process.analysisPatTaus = process.selectedPatTausPF.clone()
+process.analysisPatTaus.preselection = cms.string(
+    'tauID("decayModeFinding") > 0.5 &'
+    ' tauID("byLooseCombinedIsolationDeltaBetaCorr3Hits") > 0.5 &'
+    ' tauID("againstMuonLoose3") > 0.5 &'
+    ' tauID("againstElectronLooseMVA3") > 0.5'
 )
-
-#----------------------------------------------------------------------------------------------------
-# Add the PFJets
-# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
-# 
-# Recommended JEC for PFJets:
-# - L1FastJet : https://twiki.cern.ch/twiki/bin/view/CMS/JECAnalysesRecommendations#Corrections
-# - L2Relative: https://twiki.cern.ch/twiki/bin/view/CMS/IntroToJEC#Mandatory_Jet_Energy_Corrections
-# - L3Absolute: https://twiki.cern.ch/twiki/bin/view/CMS/IntroToJEC#Mandatory_Jet_Energy_Corrections
-#----------------------------------------------------------------------------------------------------
-
-from PhysicsTools.PatAlgos.tools.jetTools import *
-
-process.load("PhysicsTools.PatAlgos.patSequences_cff")
-
-process.load("Leptoquarks.RootTupleMakerV2.ak5PFchsJets_cff")
-
-addJetCollection(process,cms.InputTag('ak5PFchsJets'),
-    'AK5', 'PFchs',
-    doJetID      = True , # Perform jet ID algorithm and store ID info in the jet                                                                                              
-    doJTA        = True , # Perform jet track association and determine jet charge                                                                                             
-    doBTagging   = True , # Perform b-tagging and store b-tagging info in the jet                                                                                              
-    doType1MET   = False, # Don't store Type1 PFMET information. This will be done by the runMEtUncertainties tool.                                                            
-    jetIdLabel   = "ak5",# Which jet ID label should be used?                                                                                                                  
-    jetCorrLabel = ('AK5PFchs', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual', 'L5Flavor']), # Which jet corrections should be used?    
-    genJetCollection = cms.InputTag("ak5GenJets") # Which GEN jets should be used?                                                                                             
-)
-
-process.patJetCorrFactorsAK5PFchs.rho = cms.InputTag("kt6PFchsJets","rho")
-process.patJetCorrFactorsAK5PFchs.useRho = cms.bool(True)
-process.patJetCorrFactorsAK5PFchs.payload = cms.string('AK5PFchs')
+process.analysisPatTaus.finalCut = cms.string('pt > 20. & abs(eta) < 2.3')
+process.patPF2PATSequencePF.replace( process.selectedPatTausPF, process.selectedPatTausPF +process.analysisPatTaus)
 
 
-#----------------------------------------------------------------------------------------------------
-# Make analysisPatJets and add them to the patDefaultSequence
-#----------------------------------------------------------------------------------------------------
 
-process.analysisPatJetsAK5PFchs = process.cleanPatJetsAK5PFchs.clone()
-process.analysisPatJetsAK5PFchs.finalCut = cms.string("abs(eta)<2.5 & pt > 10")
-process.patDefaultSequence.replace ( process.cleanPatJetsAK5PFchs, process.cleanPatJetsAK5PFchs + process.analysisPatJetsAK5PFchs )
 
-#----------------------------------------------------------------------------------------------------  
-# Add the pileup MVA to the PFJets
-#----------------------------------------------------------------------------------------------------
 
-#process.load("Leptoquarks.RootTupleMakerV2.pujetidsequence_cff")
+### setting up MET                                                                                                                                               
+getattr(process,'patPFMet'+postfix).addGenMET = cms.bool(not isData)
+#process.patPFMet.addGenMET = cms.bool(not isData)
 
-#----------------------------------------------------------------------------------------------------
-# Switch to CaloJets
-# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#Jet_Tools
-#
-# Yes, CaloJets are already the default, so switching to them seems counter-intuitive
-# But by default in this version of PAT (V08-09-62), CaloJet corrections are done with L1Offset
-# 
-# This is a problem for two reasons:
-# - The newer GlobalTags (including START53_V27) do not include L1Offset corrections
-# - The recommended corrections for L1 corrections in CaloJets are L1FastJet corrections
-# 
-# So we use switchJetCollection to switch to CaloJets with the L1FastJet corrections
-# 
-# Recommended JEC for CaloJets:
-# - L1FastJet : https://twiki.cern.ch/twiki/bin/view/CMS/JECAnalysesRecommendations#Corrections
-# - L2Relative: https://twiki.cern.ch/twiki/bin/view/CMS/IntroToJEC#Mandatory_Jet_Energy_Corrections
-# - L3Absolute: https://twiki.cern.ch/twiki/bin/view/CMS/IntroToJEC#Mandatory_Jet_Energy_Corrections
-#----------------------------------------------------------------------------------------------------
-
-switchJetCollection(process,cms.InputTag('ak5CaloJets'),
-    doJetID      = True , # Perform jet ID algorithm and store ID info in the jet
-    doJTA        = True , # Perform jet track association and determine jet charge
-    doBTagging   = True , # Perform b-tagging and store b-tagging info in the jet
-    doType1MET   = True , # Store Type1 PFMET information.  Label of resulting PFMET collection is: patMETsAK5Calo
-    jetIdLabel   = "ak5",# Which jet ID label should be used?
-    jetCorrLabel = ('AK5Calo', ['L1FastJet', 'L2Relative', 'L3Absolute', 'L2L3Residual']), # Which jet corrections should be used?
-    genJetCollection = cms.InputTag("ak5GenJets") # Which GEN jets should be used?
-)
-
-#----------------------------------------------------------------------------------------------------
-# Define the systematic shift correction
-# Private email from Christian Veelken.  Original values are here:
-# http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/CMSSW/JetMETCorrections/Type1MET/python/pfMETsysShiftCorrections_cfi.py?revision=1.7&view=markup
-#----------------------------------------------------------------------------------------------------
-
+#----------------------------------------------------------------------------------------------------                                                            
+# Define the systematic shift correction                                                                                                                         
+#----------------------------------------------------------------------------------------------------                                                            
 process.load("JetMETCorrections.Type1MET.pfMETCorrections_cff")
 process.load("JetMETCorrections.Type1MET.pfMETsysShiftCorrections_cfi")
+from PhysicsTools.PatAlgos.tools.helpers  import cloneProcessingSnippet
+cloneProcessingSnippet(process, process.pfMEtSysShiftCorrSequence, postfix)
+process.pfMEtSysShiftCorrPF.parameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_mc
+process.pfMEtSysShiftCorrPF.src =  cms.InputTag('pfMet')
 
-process.pfMEtSysShiftCorr.parameter = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data
+#----------------------------------------------------------------------------------------------------                                                            
+###### MET                                                                                                                                                               
+print '=' * 60
+print "----- Add patPFMETtype0Corr to patType1CorrectedPFMet"
+print '=' * 60
 
-#----------------------------------------------------------------------------------------------------
-# Use the runMetUncertainties tool here
-# See https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuidePATTools#MET_Systematics_Tools
-#----------------------------------------------------------------------------------------------------
-
-from PhysicsTools.PatUtils.tools.metUncertaintyTools import runMEtUncertainties
-
-runMEtUncertainties(
-    process,
-    jetCollection           = cms.InputTag('analysisPatJetsAK5PFchs'),
-    doApplySysShiftCorr     = True,  # Apply correction for systematic x/y shift in MET
-    doApplyType0corr        = True,  # Apply correction for pileup
-    makeType1corrPFMEt      = True,  # Apply correction for jet energy scale
-    makeType1p2corrPFMEt    = False, # DO NOT apply correction for unclustered energy (degrades MET resolution)
-    makePFMEtByMVA          = False, # We don't use MVA PFMET 
-    doSmearJets             = False, # Very important to NOT smear the pfjets (DATA ONLY)
-    addToPatDefaultSequence = True,  # Add this to the PAT sequence
-    sysShiftCorrParameter   = process.pfMEtSysShiftCorrParameters_2012runABCDvsNvtx_data
+process.metUncertaintySequence = cms.Sequence()
+#### patMETs changed to == type 1 corrected MET. 
+getattr(process,'patMETs'+postfix).metSource = cms.InputTag("patType1CorrectedPFMet"+postfix)
+getattr(process,'patType1CorrectedPFMet'+postfix).srcType1Corrections = cms.VInputTag(
+    cms.InputTag("patPFJetMETtype1p2Corr"+postfix,"type1")
 )
 
-#----------------------------------------------------------------------------------------------------
-# Available pat::MET collections for analysis
-# - process.patMETsTC                               : raw        TCMET   (NO  jet smearing)
-# 
-# - process.patMETsRawCalo                          : raw        CaloMET (NO  jet smearing)
-# - process.patMETs                                 : Type1      CaloMET (NO  jet smearing)
-# 
-# - process.patMETsRawPF                            : raw        PFMET   (NO  jet smearing)
-# - process.patType1CorrectedPFMet_Type1Only        : Type1      PFMET   (NO  jet smearing)
-# - process.patType1CorrectedPFMet_Type01Only       : Type0+1    PFMET   (NO  jet smearing)
-# - process.patType1CorrectedPFMet                  : Type0+1+XY PFMET   (NO  jet smearing) <-- Recommended for analysis
-# 
-# Notes:
-# - No Type0 corrections are available for CaloMET
-# - No Type0 or Type1 corrections are available for TCMET
-# - No Type2 corrections recommended for any MET, since they degrade the MET resolution
-#
-# Thanks to Jared Sturdy, Christian Veelken, and Guler Karapinar
-#----------------------------------------------------------------------------------------------------
 
-#----------------------------------------------------------------------------------------------------
-# Add the raw CaloMET and raw PFMET
-# Raw TCMET is already included: patMETsRawTC
-#----------------------------------------------------------------------------------------------------
-
-# CaloMET: raw
-
-process.patMETsRawCalo = process.patMETsTC.clone()
-process.patMETsRawCalo.metSource = cms.InputTag("met")
-
-# PFMET: raw
-
-process.patMETsRawPF = process.patMETsTC.clone()
-process.patMETsRawPF.metSource = cms.InputTag("pfMet")
-
-# PFMET: Type1, with jet smearing
-
-process.patType1CorrectedPFMetType1Only = process.patType1CorrectedPFMet.clone()
-process.patType1CorrectedPFMetType1Only.srcType1Corrections = cms.VInputTag(
-    cms.InputTag("patPFJetMETtype1p2Corr","type1"), 
-    # cms.InputTag("patPFMETtype0Corr"), 
-    # cms.InputTag("pfMEtSysShiftCorr")
+### patType1CorrectedPFMetType1OnlyPF == patMETsPF
+process.patType1CorrectedPFMetType1OnlyPF = process.patType1CorrectedPFMetPF.clone()
+process.patType1CorrectedPFMetType1OnlyPF.srcType1Corrections = cms.VInputTag(
+    cms.InputTag("patPFJetMETtype1p2CorrPF","type1"),
 )
 
-# PFMET: Type0+1, with jet smearing
-
-process.patType1CorrectedPFMetType01Only = process.patType1CorrectedPFMet.clone()
-process.patType1CorrectedPFMetType01Only.srcType1Corrections = cms.VInputTag(
-    cms.InputTag("patPFJetMETtype1p2Corr","type1"), 
-    cms.InputTag("patPFMETtype0Corr"), 
-    # cms.InputTag("pfMEtSysShiftCorr")
+### patType1CorrectedPFMetType01OnlyPF = Type 0 + 1 
+process.patType1CorrectedPFMetType01OnlyPF = process.patType1CorrectedPFMetPF.clone()
+process.patType1CorrectedPFMetType01OnlyPF.srcType1Corrections = cms.VInputTag(
+    cms.InputTag("patPFJetMETtype1p2CorrPF","type1"),
+    cms.InputTag("patPFMETtype0CorrPF"),
+    # cms.InputTag("pfMEtSysShiftCorr")                                                                                                                                                                          
 )
 
-#----------------------------------------------------------------------------------------------------
-# This is data, so the systematic MET collections shouldn't be considered
-#----------------------------------------------------------------------------------------------------
-
-process.rootTuplePFMETType01XYCorUnclusteredUp.InputTag   = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorUnclusteredDown.InputTag = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorElectronEnUp.InputTag    = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorElectronEnDown.InputTag  = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorMuonEnUp.InputTag        = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorMuonEnDown.InputTag      = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorTauEnUp.InputTag         = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorTauEnDown.InputTag       = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorJetResUp.InputTag        = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorJetResDown.InputTag      = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorJetEnUp.InputTag         = cms.InputTag("patType1CorrectedPFMet")
-process.rootTuplePFMETType01XYCorJetEnDown.InputTag       = cms.InputTag("patType1CorrectedPFMet") 
+### patType1CorrectedPFMetType01XYOnlyPF = Type 0 + 1   + phi corrected
+process.patType1CorrectedPFMetType01XYOnlyPF = process.patType1CorrectedPFMetPF.clone()
+process.patType1CorrectedPFMetType01XYOnlyPF.srcType1Corrections = cms.VInputTag(
+    cms.InputTag("patPFJetMETtype1p2CorrPF","type1"),
+    cms.InputTag("patPFMETtype0CorrPF"),
+    cms.InputTag("pfMEtSysShiftCorrPF"), 
+)
 
 
-#----------------------------------------------------------------------------------------------------
-# This is data, so analyze the smeared PFJets by default
-#----------------------------------------------------------------------------------------------------
+process.patType1CorrectedPFMetType01XYOnlyPFUnclustup = process.patType1CorrectedPFMetType01XYOnlyPF.clone()
+process.patType1CorrectedPFMetType01XYOnlyPFUnclustdown = process.patType1CorrectedPFMetType01XYOnlyPF.clone()
 
-process.rootTuplePFJets.InputTag = cms.InputTag('analysisPatJetsAK5PFchs')
+from PhysicsTools.PatAlgos.producersLayer1.metProducer_cfi import patMETs
+
+### Create Raw MET collection
+process.RawMET = patMETs.clone(
+    metSource = cms.InputTag('patPFMetPF'),
+    addGenMET = cms.bool(False)
+)
 
 
-#----------------------------------------------------------------------------------------------------
-# Set Lepton-Gen Matching Parameters
-#----------------------------------------------------------------------------------------------------
+### Muons
+process.rootTupleMuons.InputTag = cms.InputTag('selectedPatMuons'+ postfix)
+process.rootTupleMuons.InputTagEnUp  = cms.InputTag('selectedPatMuons'+ postfix)
+process.rootTupleMuons.InputTagEnDown  = cms.InputTag('selectedPatMuons'+ postfix)
+### Loose Muons
+process.rootTupleMuonsLoose.InputTag = cms.InputTag('selectedPatMuons'+ postfixLoose)
+process.rootTupleMuonsLoose.InputTagEnUp  = cms.InputTag('selectedPatMuons'+ postfixLoose)
+process.rootTupleMuonsLoose.InputTagEnDown  = cms.InputTag('selectedPatMuons'+ postfixLoose)
 
-process.load("Leptoquarks.RootTupleMakerV2.leptonGenMatching_cfi")
-process.patDefaultSequence.replace( process.electronMatch, process.elMatch )
-process.patElectrons.genParticleMatch = cms.VInputTag( cms.InputTag("elMatch") )
-process.patDefaultSequence.replace( process.muonMatch, process.muMatch )
-process.patMuons.genParticleMatch = cms.VInputTag( cms.InputTag("muMatch") )
-process.patDefaultSequence.replace( process.tauMatch, process.tauLepMatch )
-process.patTaus.genParticleMatch = cms.VInputTag( cms.InputTag("tauLepMatch") )
-process.patDefaultSequence.replace( process.tauGenJetMatch, process.tauJetMatch )
-process.patTaus.genJetMatch = cms.InputTag("tauJetMatch")
+### Electrons
+process.rootTupleElectrons.InputTag = cms.InputTag('selectedPatElectrons' + postfix)
+process.rootTupleElectrons.InputTagEnUp  =  cms.InputTag('selectedPatElectrons' + postfix)
+process.rootTupleElectrons.InputTagEnDown =  cms.InputTag('selectedPatElectrons' + postfix)
+### Loose Electtrons
+process.rootTupleElectronsLoose.InputTag = cms.InputTag('selectedPatElectrons' + postfixLoose)
+process.rootTupleElectronsLoose.InputTagEnUp  =  cms.InputTag('selectedPatElectrons' + postfixLoose)
+process.rootTupleElectronsLoose.InputTagEnDown =  cms.InputTag('selectedPatElectrons' + postfixLoose)
 
-#----------------------------------------------------------------------------------------------------
-# Lepton + Jets filter
-#----------------------------------------------------------------------------------------------------
+### JETS
+process.rootTuplePFJets.InputTag = cms.InputTag('selectedPatJets' + postfix)
+process.rootTuplePFJets.InputTagSmearedUp   = cms.InputTag('selectedPatJets' + postfix)
+process.rootTuplePFJets.InputTagSmearedDown = cms.InputTag('selectedPatJets' + postfix)
+process.rootTuplePFJets.InputTagScaledUp    = cms.InputTag('selectedPatJets' + postfix)
+process.rootTuplePFJets.InputTagScaledDown  = cms.InputTag('selectedPatJets' + postfix)
+
+#----------------------------------------------------------------------------------------------------                                                            
+# Lepton + Jets filter                                                                                                                                           
+#----------------------------------------------------------------------------------------------------                                                            
 
 process.load("Leptoquarks.LeptonJetFilter.leptonjetfilter_cfi")
 
-#### Shared Muon/Electron/Tau Skim
-process.LJFilter.tauLabel  = cms.InputTag("cleanPatTaus")                        
-process.LJFilter.muLabel   = cms.InputTag("cleanPatMuons")
-process.LJFilter.elecLabel = cms.InputTag("cleanPatElectrons")
-process.LJFilter.jetLabel  = cms.InputTag("analysisPatJetsAK5PFchs")
+#### Shared Muon/Electron/Tau Skim                                                                                                                               
+process.LJFilter.tauLabel  = cms.InputTag('selectedPatTaus' + postfix)
+process.LJFilter.muLabel   = cms.InputTag('selectedPatMuons' + postfixLoose)
+process.LJFilter.elecLabel = cms.InputTag('selectedPatElectrons' + postfixLoose)
+process.LJFilter.jetLabel  = cms.InputTag('selectedPatJets' + postfix)
 process.LJFilter.muonsMin = 1
 process.LJFilter.muPT     = 15.0
 process.LJFilter.electronsMin = 1
@@ -369,196 +582,121 @@ process.LJFilter.jetsMin = 0
 process.LJFilter.jetPT   = 20.0
 process.LJFilter.counteitherleptontype = True
 process.LJFilter.customfilterEMuTauJet2012 = False
-# -- WARNING :
-# "customfilterEMuTauJet2012" configuration is hard-coded.
-# (see: http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/UserCode/Leptoquarks/LeptonJetFilter/src/LeptonJetFilter.cc )
-# "customfilterEMuTauJet2012" is the desired mode of operation for the Lepton+Jets Filter in 2012.
 
-#----------------------------------------------------------------------------------------------------
-# Define the output tree for RootTupleMakerV2
-#----------------------------------------------------------------------------------------------------
 
-# RootTupleMakerV2 tree
+
+#----------------------------------------------------------------------------------------------------                                                            
+# Define the output tree for RootTupleMakerV2                                                                                                                    
+#----------------------------------------------------------------------------------------------------                                                            
+
+# RootTupleMakerV2 tree                                                                                                                                          
 process.rootTupleTree = cms.EDAnalyzer("RootTupleMakerV2_Tree",
     outputCommands = cms.untracked.vstring(
         'drop *',
-        # Event information
+        # Event information                                                                                                                                      
         'keep *_rootTupleEvent_*_*',
         'keep *_rootTupleEventSelection_*_*',
-        # Single objects
+        # Single objects                                                                                                                                         
         'keep *_rootTuplePFCandidates_*_*',
         'keep *_rootTuplePFJets_*_*',
-        'keep *_rootTupleCaloJets_*_*',
         'keep *_rootTupleElectrons_*_*',
+        'keep *_rootTupleElectronsLoose_*_*',
         'keep *_rootTupleMuons_*_*',
-        'keep *_rootTupleHPSTaus_*_*',
-        'keep *_rootTuplePhotons_*_*',
+        'keep *_rootTupleMuonsLoose_*_*',
         'keep *_rootTupleVertex_*_*',
-        # MET objects for analysis
-        'keep *_rootTupleTCMET_*_*',
-        'keep *_rootTupleCaloMET_*_*',
-        'keep *_rootTupleCaloMETType1Cor_*_*',
+        # MET objects for analysis                                                                                                                               
         'keep *_rootTuplePFMET_*_*',
         'keep *_rootTuplePFMETType1Cor_*_*',
         'keep *_rootTuplePFMETType01Cor_*_*',
         'keep *_rootTuplePFMETType01XYCor_*_*',
         'keep *_rootTuplePFMETType01XYCor_*_*',
-        # pdf weights
+        # pdf weights                                                                                                                                            
         'keep *_rootTuplePFMETType01XYCorUnclusteredUp_*_*',
         'keep *_rootTuplePFMETType01XYCorUnclusteredDown_*_*',
         'keep *_rootTuplePFMETType01XYCorElectronEnUp_*_*',
         'keep *_rootTuplePFMETType01XYCorElectronEnDown_*_*',
-        'keep *_rootTuplePFMETType01XYCorMuonEnUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorMuonEnDown_*_*',
-        'keep *_rootTuplePFMETType01XYCorTauEnUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorTauEnDown_*_*',
-        'keep *_rootTuplePFMETType01XYCorJetResUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorJetResDown_*_*',
-        'keep *_rootTuplePFMETType01XYCorJetEnUp_*_*',
-        'keep *_rootTuplePFMETType01XYCorJetEnDown_*_*',
-        # Trigger objects
+        # Trigger objects                                                                                                                                        
         'keep *_rootTupleTrigger_*_*',
-        'keep *_rootTupleTriggerObjects_*_*',
-        # GEN objects
-        'keep *_rootTupleGenEventInfo_*_*',
-        'keep *_rootTupleGenParticles_*_*',
-        'keep *_rootTupleGenJets_*_*',
-        'keep *_rootTupleGenElectronsFromWs_*_*',
-        'keep *_rootTupleGenElectronsFromZs_*_*',
-        'keep *_rootTupleGenMuonsFromWs_*_*',
-        'keep *_rootTupleGenMuonsFromZs_*_*',
-        'keep *_rootTupleGenTausFromWs_*_*',
-        'keep *_rootTupleGenTausFromZs_*_*',
-        'keep *_rootTupleGenMETTrue_*_*',
-        'keep *_rootTupleGenMETCalo_*_*'       
+        'keep *_rootTupleTriggerObjects_*_*'
     )
 )
 
-#----------------------------------------------------------------------------------------------------
-# Define GEN particle skimmer modules
-#----------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------                                                            
+# Define the path                                                                                                                                                
+#----------------------------------------------------------------------------------------------------       
 
-process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromZs_cfi')
-process.load ('Leptoquarks.LeptonJetGenTools.genTauMuElFromWs_cfi') 
+#patAddOnSequence = cms.Sequence(
+#  getattr( process, 'intermediatePatElectrons' + postfix )
+#)
+#setattr( process, 'patAddOnSequence' + postfix, patAddOnSequence )
 
-#----------------------------------------------------------------------------------------------------
-# Define the path 
-#----------------------------------------------------------------------------------------------------
-
+# The paths      
 process.p = cms.Path(
-    # gen particle skimmer modules
-    process.ak5PFchsJetsSequence*
-    process.genTausFromWs*
-    process.genMuonsFromWs*
-    process.genElectronsFromWs*
-    process.genTausFromZs*
-    process.genMuonsFromZs*
-    process.genElectronsFromZs*
-    # MVA electron ID
-    process.mvaID*
-    # HEEP rho for isolation correction
-    process.kt6PFJetsForHEEPIsolation*
-    # Good vertices
-    process.goodVertices*
-    # PFMET corrections
-    process.type0PFMEtCorrection*
-    process.patPFMETtype0Corr*
-    process.producePFMETCorrections*
-    process.pfMEtSysShiftCorrSequence*
-    # MET filters (required):
-    process.EcalDeadCellTriggerPrimitiveFilter*
-    process.EcalDeadCellBoundaryEnergyFilter*
-    process.HBHENoiseFilterResultProducer*
-    process.trackingFailureFilter*
-    process.eeBadScFilter*
-    process.ecalLaserCorrFilter*
-    # Now the regular PAT default sequence
-    process.patDefaultSequence*
-    # Add the pileup MVA to the jets
-    #process.puJetIdSequence*
-    # MET producers
-    process.patMETsRawCalo*
-    process.patMETsRawPF*
-    process.patType1CorrectedPFMetType1Only*
-    process.patType1CorrectedPFMetType01Only*
-    # L+J Filter
-    process.LJFilter*  
-    # Run PAT conversions for electrons
-    process.patConversions*
-    # Now produce the raw CaloMET and raw PFMET 
-    # Re-run full HPS sequence to fully profit from the fix of high pT taus
-    process.recoTauClassicHPSSequence*
-    # RootTupleMakerV2
-    (
-    # Event information
+  process.goodOfflinePrimaryVertices*
+  process.step0b*
+  process.eidMVASequence*
+
+  process.HEEPId*
+  # MVA electron ID                                                                                                                                            
+
+  # HEEP rho for isolation correction                                                                                                                          
+  process.kt6PFJetsForHEEPIsolation*
+  # Good vertices                                                                                                                                              
+  process.goodVertices*
+  # PFMET corrections                                                                                                                                          
+  # MET filters (required):                                                                                                                                    
+  process.EcalDeadCellTriggerPrimitiveFilter*
+  process.EcalDeadCellBoundaryEnergyFilter*
+  process.HBHENoiseFilterResultProducer*
+  process.trackingFailureFilter*
+  process.eeBadScFilter*
+  process.ecalLaserCorrFilter*
+  getattr( process, 'patPF2PATSequence' + postfix )*
+  getattr( process, 'patPF2PATSequence' + postfixLoose )*
+
+  process.RawMET*
+  process.pfMEtSysShiftCorrSequencePF*
+  process.patType1CorrectedPFMetType1OnlyPF*
+  process.patType1CorrectedPFMetType01OnlyPF*
+  process.patType1CorrectedPFMetType01XYOnlyPF*
+  process.patType1CorrectedPFMetType01XYOnlyPFUnclustup*
+  process.patType1CorrectedPFMetType01XYOnlyPFUnclustdown*
+  process.LJFilter*
+    # Run PAT conversions for electrons                                                                                                                          
+  process.patConversions*
+  # Re-run full HPS sequence to fully profit from the fix of high pT taus                                                                                      
+  process.recoTauClassicHPSSequence*
+  (
+   # Event information                                                                                                                                          
     process.rootTupleEvent+
     process.rootTupleEventSelection+
-    # Single objects
+    # Single objects                                                                                                                                             
     process.rootTuplePFCandidates+
     process.rootTuplePFJets+
-    process.rootTupleCaloJets+
     process.rootTupleElectrons+
+    process.rootTupleElectronsLoose+
     process.rootTupleMuons+
-    process.rootTupleHPSTaus+
-    process.rootTuplePhotons+
+    process.rootTupleMuonsLoose+
+    #process.rootTupleHPSTaus+
+    #process.rootTuplePhotons+
     process.rootTupleVertex+
-    # MET objects for analysis
-    process.rootTupleTCMET+
-    process.rootTupleCaloMET+
-    process.rootTupleCaloMETType1Cor+
+    # MET objects for analysis                                                                                                                                   
     process.rootTuplePFMET+
     process.rootTuplePFMETType1Cor+
     process.rootTuplePFMETType01Cor+
     process.rootTuplePFMETType01XYCor+
-    # MET objects for systematics
+    # MET objects for systematics                                                                                                                                
     process.rootTuplePFMETType01XYCorUnclusteredUp+
     process.rootTuplePFMETType01XYCorUnclusteredDown+
-    process.rootTuplePFMETType01XYCorElectronEnUp+
-    process.rootTuplePFMETType01XYCorElectronEnDown+
-    process.rootTuplePFMETType01XYCorMuonEnUp+
-    process.rootTuplePFMETType01XYCorMuonEnDown+
-    process.rootTuplePFMETType01XYCorTauEnUp+
-    process.rootTuplePFMETType01XYCorTauEnDown+
-    process.rootTuplePFMETType01XYCorJetResUp+
-    process.rootTuplePFMETType01XYCorJetResDown+
-    process.rootTuplePFMETType01XYCorJetEnUp+
-    process.rootTuplePFMETType01XYCorJetEnDown+
-    # Trigger objects
+
+    ## Trigger objects                                                                                                                                           
     process.rootTupleTrigger+
-    process.rootTupleTriggerObjects+
-    # GEN objects
-    process.rootTupleGenEventInfo+
-    process.rootTupleGenParticles+
-    process.rootTupleGenJets+
-    process.rootTupleGenElectronsFromWs+
-    process.rootTupleGenElectronsFromZs+
-    process.rootTupleGenMuonsFromWs+
-    process.rootTupleGenMuonsFromZs+
-    process.rootTupleGenTausFromWs+
-    process.rootTupleGenTausFromZs+
-    process.rootTupleGenMETTrue+
-    process.rootTupleGenMETCalo
+    process.rootTupleTriggerObjects
     )*
-    # Put everything into the tree
-    process.rootTupleTree
+ process.rootTupleTree
+    #process.dump                                                                                                                                                
 )
-
-#----------------------------------------------------------------------------------------------------
-# Dump the root file
-#----------------------------------------------------------------------------------------------------
-
-#process.dump_module = cms.OutputModule("PoolOutputModule",
-#    outputCommands = cms.untracked.vstring('keep *'),
-#    fileName       = cms.untracked.string ('dump.root')
-#)
-#process.dump = cms.EndPath (process.dump_module )
 del process.out
 del process.outpath
 
-
-#----------------------------------------------------------------------------------------------------
-# Run the path
-#----------------------------------------------------------------------------------------------------
-
 process.schedule = cms.Schedule(process.p)
-
