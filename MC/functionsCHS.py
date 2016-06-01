@@ -19,7 +19,7 @@ def makeConfigFile(dataset,  data, uidir, dir, sample):
     config+='\n'
     config+='### Splitting parameters\n'
     config+='total_number_of_events=-1\n'
-    config+='events_per_job = 5000\n'
+    config+='events_per_job = 20000\n'
     config+='\n'
     config+='### The output files (comma separated list)\n'
     config+='output_file = file.root\n'
@@ -57,7 +57,7 @@ def makeConfigFile(dataset,  data, uidir, dir, sample):
     config+='eMail = jalmond@cern.ch\n'
     config+='[GRID]\n'
     config+='\n'
-    config+='#se_black_list = T2_DE_DESY,T2_UK_London_Brunel\n'
+    config+='se_black_list = T2_DE_DESY,T2_UK_London_Brunel,T2_US_Wisconsin,T2_US_MIT,T2_US_Nebraska,T2_US_UCSD\n'
     config+='#se_white_list = T2_PK_NCP\n'
     config+='\n'
 

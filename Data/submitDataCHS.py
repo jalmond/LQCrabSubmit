@@ -8,7 +8,9 @@ Muons = ["SingleMuon" ,"MuA", "MuB","MuC", "MuD"]
 Electrons = ["SingleElectron" ,"ElA", "ElB","ElC", "ElD"]
 
 
-list_to_submit = Muons
+#list_to_submit = Muons
+list_to_submit = Electrons
+
 
 #### IF YOU WISH TO PRODUCE A SECOND SAMPLE
 ### put any sample name in Extension and it will be resubmitted with new output name  

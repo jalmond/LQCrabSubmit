@@ -1,14 +1,13 @@
 # systematic samples GBYU
 
-systop3 /TTJets_MSDecays_matchingdown_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v2/AODSIM
-systop4 /TTJets_MSDecays_matchingup_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v2/AODSIM
-systop5 /TTJets_MSDecays_scaledown_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
-systop6 /TTJets_MSDecays_scaleup_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
-
-systop8	/TTJets_MSDecays_mass173_5_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
-systop9	/TTJets_MSDecays_mass171_5_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
-topfix1 /TT_weights_CT10_AUET2_8TeV-powheg-herwig/Summer12DR53X-PU_S10_START53_V19-v2/AODSIM
-topfix2 /TT_weights_CT10_TuneP11C-8TeV-powheg-pythia6-tauola/Summer12DR53X-PU_S10_START53_V19-v3/AODSIM
+systop1 /TTJets_MSDecays_matchingdown_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v2/AODSIM
+systop2 /TTJets_MSDecays_matchingup_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v2/AODSIM
+systop3 /TTJets_MSDecays_scaledown_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+systop4 /TTJets_MSDecays_scaleup_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+systop5	/TTJets_MSDecays_mass173_5_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+systop6	/TTJets_MSDecays_mass171_5_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V19-v1/AODSIM
+systop7 /TT_weights_CT10_AUET2_8TeV-powheg-herwig/Summer12DR53X-PU_S10_START53_V19-v2/AODSIM
+systop8 /TT_weights_CT10_TuneP11C-8TeV-powheg-pythia6-tauola/Summer12DR53X-PU_S10_START53_V19-v3/AODSIM
 
 TTH   /TTH_Inclusive_M-125_8TeV_pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM
 

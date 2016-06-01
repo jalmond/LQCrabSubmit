@@ -116,7 +116,7 @@ print "Finished setting up usePF2PAT"
 print '*' * 60
 
 postfixLoose='PFLoose'
-from PhysicsTools.PatAlgos.tools.pfTools import usePF2PAT
+
 usePF2PAT( process
          , runPF2PAT           = True
          , runOnMC             = runOnMC
@@ -281,7 +281,11 @@ print 'getattr(process,"pfNoElectron"+postfix).enable = True'
 print 'getattr(process,"pfNoTau"+postfix).enable = False'
 print 'getattr(process,"pfNoJet"+postfix).enable = True'
 
-
+getattr(process,"pfNoPileUp"+postfixLoose).enable = True
+getattr(process,"pfNoMuon"+postfixLoose).enable = True
+getattr(process,"pfNoElectron"+postfixLoose).enable = True
+getattr(process,"pfNoTau"+postfixLoose).enable = False
+getattr(process,"pfNoJet"+postfixLoose).enable = True
 
 
 ## LOADING Ntuple modules

@@ -59,7 +59,7 @@ def makeConfigFile(dataset,   uidir, dir):
     config+='eMail = jalmond@cern.ch\n'
     config+='[GRID]\n'
     config+='\n'
-    config+='#se_black_list = cream01.iihe.ac.be\n'
+    config+='se_black_list = cream01.iihe.ac.be,T2_US_Wisconsin,T2_US_MIT,T2_US_Nebraska,T2_US_UCSD\n'
     config+='#se_white_list = charm.ucr.edu\n'
     config+='\n'
 
